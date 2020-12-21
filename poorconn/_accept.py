@@ -13,7 +13,18 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from ._accept import close_upon_accepting
-from ._socket import PatchableSocket
+from socket import socket
 
-from ._version import version as __version__
+from ._wrappers import wrap_accept
+
+
+def close_upon_accepting(s: socket):
+    """Close the socket upon accepting.
+
+    :param s: The :class`socket.socket` object whose ``accept()`` function is to be wrapped.
+    """
+
+    def after(s, *, original, before):
+        s.close()
+
+    return wrap_accept(s, after=after)
