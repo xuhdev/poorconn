@@ -18,12 +18,14 @@ from types import MethodType
 from typing import Any, Callable, Optional
 
 
-def wrap_accept(s: socket, *,
-                before: Optional[Callable[[socket], Any]] = None,
-                after: Optional[Callable[..., Any]] = None) -> None:
-    """Wrap :func:`socket.socket.accept`.
+def wrap(s: socket, *,
+         meth: str,
+         before: Optional[Callable[[socket], Any]] = None,
+         after: Optional[Callable[..., Any]] = None) -> None:
+    """Wrap a socket member method named ``meth``.
 
     :param s: The socket object.
+    :param meth: Name of the method to be wrapped.
     :param before: Function to be called before :func:`socket.socket.accept`. The socket object will be passed in as the
     first parameter.
     :param after: Function to be called after :func:`socket.socket.accept`. The socket object will be passed in as the
@@ -32,11 +34,19 @@ def wrap_accept(s: socket, *,
         value of the ``before`` function will be pass.
     """
 
-    wrapped_accept = s.accept
+    wrapped_meth = getattr(s, meth)
 
     def wrapping_function(self, *args: Any, **kwargs: Any) -> Any:
         ret_before = before(self) if before is not None else None
-        ret_wrapped = wrapped_accept(*args, **kwargs)  # type: ignore
+        ret_wrapped = wrapped_meth(*args, **kwargs)
         return after(self, original=ret_wrapped, before=ret_before) if after is not None else ret_wrapped
 
-    s.accept = MethodType(wrapping_function, s)  # type: ignore
+    setattr(s, meth, MethodType(wrapping_function, s))  # type: ignore
+
+
+def wrap_accept(s: socket, *,
+                before: Optional[Callable[[socket], Any]] = None,
+                after: Optional[Callable[..., Any]] = None) -> None:
+    "Wrap :meth:`socket.socket.accept`. This function calls :func:`.wrap` with ``meth='accept'``."
+
+    wrap(s, meth='accept', before=before, after=after)
