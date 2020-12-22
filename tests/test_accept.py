@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from socket import socket
+from socket import socket, SO_REUSEADDR, SOL_SOCKET
 
 import pytest
 import requests
@@ -27,10 +27,11 @@ def test_close_upon_accepting(timeout):
     "Test :func:`poorconn.close_upon_accepting` with ``HTTPServer``."
 
     with PatchableSocket() as server_sock:
+        server_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         server_sock.bind(('localhost', 7999))
         id_accept = id(server_sock.accept)
         close_upon_accepting(server_sock)
-        assert id_accept != id(server_sock.accept)  # Ensure that accept() has been wrapped
+        assert id_accept != id(server_sock.accept)  # Ensure that the socket object is wrapped
         with utils.mirror_server_socket_new_thread(server_sock):
             with socket() as client_sock:
                 client_sock.connect(('localhost', 7999))
@@ -44,8 +45,13 @@ def test_close_upon_accepting_http_server(http_server, http_url, timeout):
     patchable_sock = PatchableSocket.create_from(http_server.socket)
     id_accept = id(patchable_sock.accept)
     close_upon_accepting(patchable_sock)
-    assert id_accept != id(http_server.socket.accept)  # Ensure that accept() has been wrapped
+    assert id_accept != id(patchable_sock.accept)  # Ensure that the socket object is wrapped
+    http_server.socket = patchable_sock
+    http_server.socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     utils.httpd_serve_new_thread(http_server)
 
-    with pytest.raises(requests.exceptions.ReadTimeout):
+    with pytest.raises(requests.exceptions.ConnectionError) as e:
         requests.get(f'{http_url}/setup.py', timeout=timeout)
+    # We don't do platform specific assertion because what is in the error string is not guaranteed
+    assert ('RemoteDisconnected' in str(e.value) or  # On Linux and MacOS
+            'ConnectionResetError' in str(e.value))  # On Windows

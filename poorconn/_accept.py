@@ -13,18 +13,20 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from socket import socket
+from socket import socket, SHUT_RDWR
 
 from ._wrappers import wrap_accept
 
 
 def close_upon_accepting(s: socket):
-    """Close the socket upon accepting.
+    """Shutdown and close the connection socket upon accepting.
 
     :param s: The :class`socket.socket` object whose ``accept()`` function is to be wrapped.
     """
 
     def after(s, *, original, before):
-        s.close()
+        original[0].shutdown(SHUT_RDWR)
+        original[0].close()
+        return original
 
     return wrap_accept(s, after=after)
