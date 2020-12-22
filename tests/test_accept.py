@@ -49,8 +49,8 @@ def test_close_upon_accepting_http_server(http_server, http_url, timeout):
     http_server.socket = patchable_sock
     utils.httpd_serve_new_thread(http_server)
 
-    with pytest.raises(requests.exceptions.ConnectionError) as e:
+    with pytest.raises(requests.exceptions.ConnectionError):
         requests.get(f'{http_url}/setup.py', timeout=timeout)
-    # We don't do platform specific assertion because what is in the error string is not guaranteed
-    assert ('RemoteDisconnected' in str(e.value) or  # On Linux and MacOS
-            'ConnectionResetError' in str(e.value))  # On Windows
+    # We don't assert the content of the exception because, for the client, the error can be anything
+    # 'RemoteDisconnected', 'ConnectionResetError', 'ConnectionAbortedError', etc., depending on the progress of the two
+    # threads.
