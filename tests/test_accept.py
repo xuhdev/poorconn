@@ -47,7 +47,6 @@ def test_close_upon_accepting_http_server(http_server, http_url, timeout):
     close_upon_accepting(patchable_sock)
     assert id_accept != id(patchable_sock.accept)  # Ensure that the socket object is wrapped
     http_server.socket = patchable_sock
-    http_server.socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     utils.httpd_serve_new_thread(http_server)
 
     with pytest.raises(requests.exceptions.ConnectionError) as e:

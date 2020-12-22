@@ -20,7 +20,7 @@ from typing import Any, Callable, Optional
 
 def wrap(s: socket, *,
          meth: str,
-         before: Optional[Callable[[socket], Any]] = None,
+         before: Optional[Callable[..., Any]] = None,
          after: Optional[Callable[..., Any]] = None) -> None:
     """Wrap a socket member method named ``meth``.
 
@@ -36,17 +36,28 @@ def wrap(s: socket, *,
 
     wrapped_meth = getattr(s, meth)
 
-    def wrapping_function(self, *args: Any, **kwargs: Any) -> Any:
-        ret_before = before(self) if before is not None else None
+    def wrapping_function(self: socket, *args: Any, **kwargs: Any) -> Any:
+        ret_before = before(self, *args, **kwargs) if before is not None else None
         ret_wrapped = wrapped_meth(*args, **kwargs)
         return after(self, original=ret_wrapped, before=ret_before) if after is not None else ret_wrapped
 
-    setattr(s, meth, MethodType(wrapping_function, s))  # type: ignore
+    setattr(s, meth, MethodType(wrapping_function, s))
 
 
 def wrap_accept(s: socket, *,
-                before: Optional[Callable[[socket], Any]] = None,
+                before: Optional[Callable[..., Any]] = None,
                 after: Optional[Callable[..., Any]] = None) -> None:
     "Wrap :meth:`socket.socket.accept`. This function calls :func:`.wrap` with ``meth='accept'``."
 
     wrap(s, meth='accept', before=before, after=after)
+
+
+def wrap_send(s: socket, *,
+              before: Optional[Callable[..., Any]] = None,
+              after: Optional[Callable[..., Any]] = None) -> None:
+    """Wrap :meth:`socket.socket.send`, :meth:`socket.socket.sendall`. This function calls :func:`.wrap` twice with
+    ``meth='send'`` and ``meth='sendall'``.
+    """
+
+    for meth in ('send', 'sendall'):
+        wrap(s, meth=meth, before=before, after=after)

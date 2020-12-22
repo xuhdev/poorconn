@@ -14,22 +14,27 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from contextlib import contextmanager
-from socket import socket
+import socket
 
 from http.server import HTTPServer
 import threading
 
 
 @contextmanager
-def mirror_server_socket_new_thread(sock: socket):
+def mirror_server_socket_new_thread(sock: socket.socket, timeout=None):
     "Start a server socket in a new thread that accepts a connection, and then sends back whatever it receives."
+
     stop = False
 
     def server_socket_work():
         sock.listen()
         conn, addr = sock.accept()
+        conn.settimeout(timeout)
         while not stop:
-            data = conn.recv(1024)
+            try:
+                data = conn.recv(1024)
+            except socket.timeout:
+                continue
             conn.sendall(data)
 
     thread = threading.Thread(target=server_socket_work, name='Mirror socket server', daemon=True)

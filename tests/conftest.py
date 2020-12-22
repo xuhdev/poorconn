@@ -14,8 +14,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 import os
+from socket import SO_REUSEADDR, SOL_SOCKET
 import sys
 
 import pytest
@@ -26,9 +27,12 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
 
 @pytest.fixture
 def http_server() -> HTTPServer:
-    "A clean HTTPServer object that listens on localhost:8000."
+    """A clean HTTPServer object that listens on localhost:8000. It also turns on ``SO_REUSEADDR`` for the underlying
+    socket object.
+    """
 
-    with HTTPServer(("localhost", 8000), BaseHTTPRequestHandler) as httpd:
+    with HTTPServer(("localhost", 8000), SimpleHTTPRequestHandler) as httpd:
+        httpd.socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         yield httpd
         httpd.shutdown()
 

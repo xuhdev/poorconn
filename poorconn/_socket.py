@@ -44,3 +44,11 @@ class PatchableSocket(socket):
     def accept(self, *args, **kwargs):
         "Wraps :meth:`socket.socket.accept` so this function is patchable."
         return super().accept(*args, **kwargs)
+
+    def send(self, *args, **kwargs):
+        "Wraps :meth:`socket.socket.send` so this function is patchable."
+        return super().send(*args, **kwargs)
+
+    def sendall(self, *args, **kwargs):
+        "Wraps :meth:`socket.socket.sendall` so this function is patchable."
+        return super().sendall(*args, **kwargs)
