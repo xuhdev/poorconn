@@ -16,7 +16,7 @@
 from socket import socket
 import time
 from types import BuiltinMethodType
-from typing import Any
+from typing import Any, Callable
 
 from ._wrappers import wrap_accept, wrap_send
 
@@ -43,9 +43,12 @@ def delay_before_sending_once(s: socket, t: float):
     wrap_send(s, before=DelayOnce(t))
 
 
-def delay_before_sending_upon_acceptance_once(s: socket, t: float):
-    """Delay ``t`` seconds before sending for all sockets returned by ``s.accept()``, for once (first time only).
-    Parameters mean the same as :func:`.delay_before_sending`.
+def wrap_sending_upon_acceptance(s: socket, wrapper: Callable, *args: Any, **kwargs: Any):
+    """Wrap sending functions of the connection socket returned by ``s.accept()``.
+    :param s: The :class:`socket.socket` object where ``s.accept()``'s sending methods are to be wrapped.
+    :param wrapper: The wrapper function.
+    :param args: Positional parameters to be passed to the wrapper.
+    :param kwargs: Keyword parameters to be passed to the wrapper.
     """
 
     def after(s, *, original, before):
@@ -53,7 +56,15 @@ def delay_before_sending_upon_acceptance_once(s: socket, t: float):
         if isinstance(conn_sock.send, BuiltinMethodType) or \
            isinstance(conn_sock.sendall, BuiltinMethodType):  # conn_sock.send or conn_sock.sendall are not modifiable
             conn_sock = PatchableSocket.create_from(conn_sock)
-        delay_before_sending_once(conn_sock, t)
+        delay_before_sending_once(conn_sock, *args, **kwargs)
         return conn_sock, original[1]
 
-    return wrap_accept(s, after=after)
+    wrap_accept(s, after=after)
+
+
+def delay_before_sending_upon_acceptance_once(s: socket, t: float):
+    """Delay ``t`` seconds before sending for all sockets returned by ``s.accept()``, for once (first time only).
+    Parameters mean the same as :func:`.delay_before_sending`.
+    """
+
+    wrap_sending_upon_acceptance(s, delay_before_sending_once, t=t)
