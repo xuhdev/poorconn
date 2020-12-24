@@ -58,9 +58,10 @@ def delay_before_sending(s: socket, t: float, length: int = 1024) -> None:
             self.length: int = length
 
         def __call__(self, sock: socket, *args: Any, **kwargs: Any):
-            bytes_ = args[0] if len(args) > 0 else kwargs.get('bytes')  # Content of the bytes parameter from send
             time.sleep(t)
-            return (bytes_[:min(length, len(bytes_))],), {}
+            bytes_ = args[0] if len(args) > 0 else kwargs.get('bytes')  # Content of the bytes parameter from send
+            flags = args[1] if len(args) > 1 else kwargs.get('flags')
+            return (bytes_[:min(length, len(bytes_))],) + ((flags,) if flags is not None else ()), {}
 
     # For send, simply truncate the length of the content to be sent to ``length`` and delay that by ``t`` seconds.
     wrap(s, meth='send', before=DelaySendEveryTime(t, length), before_pass=True)
