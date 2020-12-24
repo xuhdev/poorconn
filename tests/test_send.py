@@ -20,7 +20,10 @@ import time
 import pytest
 import requests
 
-from poorconn import delay_before_sending_once, delay_before_sending_upon_acceptance_once, PatchableSocket
+from poorconn import (delay_before_sending,
+                      delay_before_sending_once,
+                      delay_before_sending_upon_acceptance_once,
+                      PatchableSocket)
 
 import utils
 
@@ -69,6 +72,29 @@ def test_delay_before_sending_once(timeout):
                 assert ending_time - starting_time > timeout
                 assert 0 < num_bytes <= 1024
                 assert client_sock.recv(num_bytes) == num_bytes * b'a'
+
+
+def test_delay_before_sending(timeout):
+    "Test :func:`poorconn.delay_before_sending`."
+
+    with socket() as server_sock:
+        server_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        server_sock.bind(('localhost', 7999))
+
+        with utils.mirror_server_socket_new_thread(server_sock, timeout=timeout):
+            with PatchableSocket() as client_sock:
+                client_sock.connect(('localhost', 7999))
+                # Patch the client side
+                id_send = id(client_sock.send)
+                delay_before_sending(client_sock, t=timeout, length=512)
+                assert id_send != id(client_sock.send)
+                for _ in range(3):  # Run 3 times
+                    starting_time = time.time()
+                    num_bytes = client_sock.send(b'a' * 1024)
+                    ending_time = time.time()
+                    assert ending_time - starting_time > timeout
+                    assert 0 < num_bytes <= 512
+                    assert client_sock.recv(num_bytes) == num_bytes * b'a'
 
 
 def test_delay_before_sending_upon_acceptance_once_http_server(http_server, http_url, timeout):

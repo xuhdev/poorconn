@@ -18,7 +18,7 @@ import time
 from types import BuiltinMethodType
 from typing import Any, Callable
 
-from ._wrappers import wrap_accept, wrap_send
+from ._wrappers import wrap, wrap_accept, wrap_send
 
 from ._socket import PatchableSocket
 
@@ -41,6 +41,30 @@ def delay_before_sending_once(s: socket, t: float):
                 self._first_time = False
 
     wrap_send(s, before=DelayOnce(t))
+
+
+def delay_before_sending(s: socket, t: float, length: int = 1024) -> None:
+    """Chop the content (``bytes`` in :meth:`socket.socket.send` and :meth:`socket.socket.sendall`) to be sent in
+    ``length`` bytes and delay ``t`` seconds before sending every time.
+
+    :param s: The :class:`socket.socket` object whose sending methods are to be delayed every time.
+    :param t: Number of seconds to delay.
+    :param length: Number of bytes of each of the slices into which the content is chopped.
+    """
+
+    class DelaySendEveryTime:
+        def __init__(self, t: float, length: int):
+            self.t: float = t
+            self.length: int = length
+
+        def __call__(self, sock: socket, *args: Any, **kwargs: Any):
+            bytes_ = args[0] if len(args) > 0 else kwargs.get('bytes')  # Content of the bytes parameter from send
+            time.sleep(t)
+            return (bytes_[:min(length, len(bytes_))],), {}
+
+    # For send, simply truncate the length of the content to be sent to ``length`` and delay that by ``t`` seconds.
+    wrap(s, meth='send', before=DelaySendEveryTime(t, length), before_pass=True)
+    # TODO: Wrap sendall properly here
 
 
 def wrap_sending_upon_acceptance(s: socket, wrapper: Callable, *args: Any, **kwargs: Any):

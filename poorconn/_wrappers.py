@@ -21,13 +21,17 @@ from typing import Any, Callable, Optional
 def wrap(s: socket, *,
          meth: str,
          before: Optional[Callable[..., Any]] = None,
+         before_pass: bool = False,
          after: Optional[Callable[..., Any]] = None) -> None:
     """Wrap a socket member method named ``meth``.
 
     :param s: The socket object.
     :param meth: Name of the method to be wrapped.
     :param before: Function to be called before :func:`socket.socket.accept`. The socket object will be passed in as the
-    first parameter.
+        first parameter.
+    :param before_pass: If True, ``before`` should return a tuple of size 2 with an interable and a dictionary, which is
+        then passed to the wrapped method as positional arguments and keyword arguments instead of the arguments
+        originally passed in by the called.
     :param after: Function to be called after :func:`socket.socket.accept`. The socket object will be passed in as the
         first parameter. It must accept a ``wrapped`` keyword argument, to which the return value of the wrapped
         :func:`socket.socket.accept` will be passed. It must accept a ``before`` keyword argument, to which the return
@@ -38,7 +42,10 @@ def wrap(s: socket, *,
 
     def wrapping_function(self: socket, *args: Any, **kwargs: Any) -> Any:
         ret_before = before(self, *args, **kwargs) if before is not None else None
-        ret_wrapped = wrapped_meth(*args, **kwargs)
+        if before_pass:
+            ret_wrapped = wrapped_meth(*ret_before[0], **ret_before[1])
+        else:
+            ret_wrapped = wrapped_meth(*args, **kwargs)
         return after(self, original=ret_wrapped, before=ret_before) if after is not None else ret_wrapped
 
     setattr(s, meth, MethodType(wrapping_function, s))
