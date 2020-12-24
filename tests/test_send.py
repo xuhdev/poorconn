@@ -74,8 +74,9 @@ def test_delay_before_sending_once(timeout):
                 assert client_sock.recv(num_bytes) == num_bytes * b'a'
 
 
-def test_delay_before_sending(timeout):
-    "Test :func:`poorconn.delay_before_sending`."
+@pytest.mark.parametrize('chopped_length', (512, 800, 1024, 1600, 2048))
+def test_delay_before_sending(timeout, chopped_length):
+    "Test :func:`poorconn.delay_before_sending`. Client will always try to send 1024 bytes."
 
     with socket() as server_sock:
         server_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
@@ -86,15 +87,26 @@ def test_delay_before_sending(timeout):
                 client_sock.connect(('localhost', 7999))
                 # Patch the client side
                 id_send = id(client_sock.send)
-                delay_before_sending(client_sock, t=timeout, length=512)
+                id_sendall = id(client_sock.sendall)
+                delay_before_sending(client_sock, t=timeout, length=chopped_length)
                 assert id_send != id(client_sock.send)
+                assert id_sendall != id(client_sock.sendall)
+
                 for _ in range(3):  # Run 3 times
                     starting_time = time.time()
                     num_bytes = client_sock.send(b'a' * 1024)
                     ending_time = time.time()
                     assert ending_time - starting_time > timeout
-                    assert 0 < num_bytes <= 512
-                    assert client_sock.recv(num_bytes) == num_bytes * b'a'
+                    assert 0 < num_bytes <= chopped_length
+                    assert utils.recv_until(client_sock, num_bytes) == num_bytes * b'a'
+
+                for _ in range(3):  # Run 3 times
+                    starting_time = time.time()
+                    client_sock.sendall(b'a' * 1024)
+                    ending_time = time.time()
+                    assert (ending_time - starting_time >
+                            timeout * max(1, 1024 // chopped_length + (1024 % chopped_length) > 0))
+                    assert utils.recv_until(client_sock, 1024) == 1024 * b'a'
 
 
 def test_delay_before_sending_upon_acceptance_once_http_server(http_server, http_url, timeout):

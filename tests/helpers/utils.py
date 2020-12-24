@@ -52,3 +52,15 @@ def httpd_serve_new_thread(httpd: HTTPServer) -> threading.Thread:
     thread.start()
     thread.join(timeout=1)  # Wait a bit to ensure the server starts up
     return thread
+
+
+def recv_until(s: socket.socket, num_bytes: int) -> bytes:
+    "Call ``s.recv()`` until ``num_bytes`` bytes are received."
+
+    recved_bytes = 0
+    content = bytes()
+    while recved_bytes < num_bytes:
+        new_content = s.recv(num_bytes - recved_bytes)
+        recved_bytes += len(new_content)
+        content += new_content
+    return content

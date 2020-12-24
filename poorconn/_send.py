@@ -15,7 +15,7 @@
 
 from socket import socket
 import time
-from types import BuiltinMethodType
+from types import BuiltinMethodType, MethodType
 from typing import Any, Callable
 
 from ._wrappers import wrap, wrap_accept, wrap_send
@@ -65,7 +65,22 @@ def delay_before_sending(s: socket, t: float, length: int = 1024) -> None:
 
     # For send, simply truncate the length of the content to be sent to ``length`` and delay that by ``t`` seconds.
     wrap(s, meth='send', before=DelaySendEveryTime(t, length), before_pass=True)
-    # TODO: Wrap sendall properly here
+    wrapped_sendall = s.sendall
+
+    # The functions that wraps sendall
+    def wrapping_function(self: socket, *args: Any, **kwargs: Any) -> Any:
+        bytes_ = args[0] if len(args) > 0 else kwargs.get('bytes')  # Content of the bytes parameter from send
+        flags = args[1] if len(args) > 1 else kwargs.get('flags')   # flags parameter
+
+        for i in range(0, len(bytes_), length):
+            time.sleep(t)
+            begin = i
+            end = min(len(bytes_), i + length)
+            args = (bytes_[begin:end],) + ((flags,) if flags is not None else ())
+            wrapped_sendall(*args)
+
+    # See https://github.com/python/mypy/issues/2427#issuecomment-480263443 for the type ignoring below
+    s.sendall = MethodType(wrapping_function, s)  # type: ignore
 
 
 def wrap_sending_upon_acceptance(s: socket, wrapper: Callable, *args: Any, **kwargs: Any):
