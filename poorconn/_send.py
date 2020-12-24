@@ -56,7 +56,7 @@ def wrap_sending_upon_acceptance(s: socket, wrapper: Callable, *args: Any, **kwa
         if isinstance(conn_sock.send, BuiltinMethodType) or \
            isinstance(conn_sock.sendall, BuiltinMethodType):  # conn_sock.send or conn_sock.sendall are not modifiable
             conn_sock = PatchableSocket.create_from(conn_sock)
-        delay_before_sending_once(conn_sock, *args, **kwargs)
+        wrapper(conn_sock, *args, **kwargs)
         return conn_sock, original[1]
 
     wrap_accept(s, after=after)
