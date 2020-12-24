@@ -13,38 +13,36 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-[tox]
-envlist = py{36,37,38,39}
+include:
+  - template: 'Workflows/MergeRequest-Pipelines.gitlab-ci.yml'
 
-[testenv]
-download = True
-deps = -rrequirements/test.txt
-commands =
-    coverage run -m pytest -v
-    coverage report
+lint:
+  image: "python:3.9"
+  script:
+    - pip install -U tox
+    - tox -vv -e lint
+  interruptible: true
 
-[testenv:lint]
-usedevelop = True
-deps = -rrequirements/lint.txt
-commands =
-    flake8 .
-    bandit -r .
-    mypy poorconn
+.runtime:
+  script:
+    - python -V
+    - export TOXENV=py$(python -V | cut -d' ' -f2 | cut -d. -f1,2 | sed 's/\.//'); echo TOXENV=$TOXENV
+    - pip install -U tox
+    - tox -vv
+  interruptible: true
 
-[testenv:dev]
-usedevelop = True
-description = development environment with all deps at {envdir}
-deps = -rrequirements-dev.txt
-commands = python -c "print(r'{envpython}')"
+runtime-3.6:
+  extends: ".runtime"
+  image: "python:3.6"
 
-[coverage:run]
-source = poorconn
+runtime-3.7:
+  extends: ".runtime"
+  image: "python:3.7"
 
-[coverage:report]
-fail_under = 100
-show_missing = True
+runtime-3.8:
+  extends: ".runtime"
+  image: "python:3.8"
 
-[flake8]
-max-line-length = 120
-exclude = .eggs,.git,__pycache__,.tox
-per-file-ignores = __init__.py:F401
+runtime-3.9:
+  extends: ".runtime"
+  image: "python:3.9"
