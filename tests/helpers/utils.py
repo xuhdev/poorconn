@@ -21,7 +21,7 @@ import threading
 
 
 @contextmanager
-def mirror_server_socket_new_thread(sock: socket.socket, timeout=None):
+def echo_server_socket_new_thread(sock: socket.socket, timeout=None):
     "Start a server socket in a new thread that accepts a connection, and then sends back whatever it receives."
 
     stop = False
@@ -37,7 +37,7 @@ def mirror_server_socket_new_thread(sock: socket.socket, timeout=None):
                 continue
             conn.sendall(data)
 
-    thread = threading.Thread(target=server_socket_work, name='Mirror socket server', daemon=True)
+    thread = threading.Thread(target=server_socket_work, name='Echo socket server', daemon=True)
     thread.start()
     thread.join(timeout=1)
     yield thread

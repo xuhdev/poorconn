@@ -40,7 +40,7 @@ def test_delay_before_sending_once(timeout):
         # Ensure that sending functions of ``server_sock`` has been wrapped
         assert id_accept != id(server_sock.accept)
 
-        with utils.mirror_server_socket_new_thread(server_sock, timeout=timeout):
+        with utils.echo_server_socket_new_thread(server_sock, timeout=timeout):
             with socket() as client_sock:
                 client_sock.connect(('localhost', 7999))
 
@@ -81,7 +81,7 @@ def test_delay_before_sending(timeout):
         server_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         server_sock.bind(('localhost', 7999))
 
-        with utils.mirror_server_socket_new_thread(server_sock, timeout=timeout):
+        with utils.echo_server_socket_new_thread(server_sock, timeout=timeout):
             with PatchableSocket() as client_sock:
                 client_sock.connect(('localhost', 7999))
                 # Patch the client side
