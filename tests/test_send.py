@@ -148,7 +148,34 @@ def test_delay_before_sending_upon_acceptance_once_http_server(http_server, http
     http_server.socket = patchable_sock
     utils.httpd_serve_new_thread(http_server)
 
-    with pytest.raises(requests.exceptions.ReadTimeout):
-        requests.get(f'{http_url}/setup.py', timeout=timeout * 0.9)
+    starting_time = time.time()
+    content = requests.get(f'{http_url}/setup.py').content
+    ending_time = time.time()
+    assert ending_time - starting_time > timeout
+    assert content == pathlib.Path('./setup.py').read_bytes()
 
+    # Another run
     assert requests.get(f'{http_url}/setup.py').content == pathlib.Path('./setup.py').read_bytes()
+
+
+@pytest.mark.parametrize('chopped_length', (1600, 2048))
+def test_delay_before_sending_upon_acceptance_http_server(http_server, http_url, timeout, chopped_length):
+    """Test :func:`poorconn.delay_before_sending_upon_acceptance` with ``HTTPServer``. Client always tries to send 1024
+    bytes every time.
+    """
+
+    patchable_sock = PatchableSocket.create_from(http_server.socket)
+    id_accept = id(patchable_sock.accept)
+    delay_before_sending_upon_acceptance(patchable_sock, t=timeout, length=chopped_length)
+    assert id_accept != id(http_server.socket.accept)  # Ensure that accept() has been wrapped
+    http_server.socket = patchable_sock
+    utils.httpd_serve_new_thread(http_server)
+
+    file_size = pathlib.Path('COPYING').stat().st_size
+    for _ in range(3):
+        starting_time = time.time()
+        content = requests.get(f'{http_url}/COPYING').content
+        ending_time = time.time()
+        assert content == pathlib.Path('COPYING').read_bytes()
+        assert ending_time - starting_time > (timeout *
+                                              max(1, file_size // chopped_length + (file_size % chopped_length > 0)))
