@@ -47,4 +47,4 @@ def http_url(http_server) -> str:
 @pytest.fixture(scope='session')
 def timeout() -> int:
     "How many seconds the test should time out for tests that require a timeout parameter."
-    return 3
+    return 2
