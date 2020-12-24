@@ -22,6 +22,7 @@ import requests
 
 from poorconn import (delay_before_sending,
                       delay_before_sending_once,
+                      delay_before_sending_upon_acceptance,
                       delay_before_sending_upon_acceptance_once,
                       PatchableSocket)
 
@@ -76,7 +77,7 @@ def test_delay_before_sending_once(timeout):
 
 @pytest.mark.parametrize('chopped_length', (512, 800, 1024, 1600, 2048))
 def test_delay_before_sending(timeout, chopped_length):
-    "Test :func:`poorconn.delay_before_sending`. Client will always try to send 1024 bytes."
+    "Test :func:`poorconn.delay_before_sending`. Client always tries to send 1024 bytes every time."
 
     with socket() as server_sock:
         server_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
@@ -107,6 +108,34 @@ def test_delay_before_sending(timeout, chopped_length):
                     assert (ending_time - starting_time >
                             timeout * max(1, 1024 // chopped_length + (1024 % chopped_length) > 0))
                     assert utils.recv_until(client_sock, 1024) == 1024 * b'a'
+
+
+@pytest.mark.parametrize('chopped_length', (512, 800, 1024, 1600, 2048))
+def test_delay_before_sending_upon_acceptance(timeout, chopped_length):
+    "Test :func:`poorconn.delay_before_sending_upon_acceptance`. Client always tries to send 1024 bytes every time."
+
+    with PatchableSocket() as server_sock:
+        server_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        server_sock.bind(('localhost', 7999))
+        id_accept = id(server_sock.accept)
+        delay_before_sending_upon_acceptance(server_sock, t=timeout, length=chopped_length)
+
+        # Ensure that sending functions of ``server_sock`` has been wrapped
+        assert id_accept != id(server_sock.accept)
+
+        with utils.echo_server_socket_new_thread(server_sock, timeout=timeout):
+            with socket() as client_sock:
+                client_sock.connect(('localhost', 7999))
+
+                for _ in range(3):  # Run 3 times
+                    sent_content = b'b' * 1024
+                    starting_time = time.time()
+                    client_sock.sendall(sent_content)
+                    recved_content = utils.recv_until(client_sock, len(sent_content))
+                    ending_time = time.time()
+                    assert sent_content == recved_content
+                    assert (ending_time - starting_time >
+                            timeout * max(1, 1024 // chopped_length + (1024 % chopped_length) > 0))
 
 
 def test_delay_before_sending_upon_acceptance_once_http_server(http_server, http_url, timeout):

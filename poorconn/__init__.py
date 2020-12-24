@@ -14,7 +14,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from ._accept import close_upon_accepting
-from ._send import delay_before_sending, delay_before_sending_once, delay_before_sending_upon_acceptance_once
+from ._send import (delay_before_sending,
+                    delay_before_sending_once,
+                    delay_before_sending_upon_acceptance,
+                    delay_before_sending_upon_acceptance_once)
 from ._socket import PatchableSocket
 
 from ._version import version as __version__

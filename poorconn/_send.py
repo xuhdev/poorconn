@@ -108,3 +108,11 @@ def delay_before_sending_upon_acceptance_once(s: socket, t: float):
     """
 
     wrap_sending_upon_acceptance(s, delay_before_sending_once, t=t)
+
+
+def delay_before_sending_upon_acceptance(s: socket, t: float, length: int = 1024):
+    """Delay ``t`` seconds before sending for all sockets returned by ``s.accept()``, for once (first time only).
+    Parameters mean the same as :func:`.delay_before_sending`.
+    """
+
+    wrap_sending_upon_acceptance(s, delay_before_sending, t=t, length=length)
