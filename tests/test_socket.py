@@ -13,11 +13,18 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from ._accept import close_upon_accepting
-from ._send import (delay_before_sending,
-                    delay_before_sending_once,
-                    delay_before_sending_upon_acceptance,
-                    delay_before_sending_upon_acceptance_once)
-from ._socket import make_socket_patchable, PatchableSocket
+from socket import socket
+from ssl import SSLContext, SSLSocket
 
-from ._version import version as __version__
+from poorconn import make_socket_patchable, PatchableSocket
+
+
+def test_make_socket_patchable():
+    "Test ``make_socket_patchable``."
+
+    s = make_socket_patchable(socket())
+    assert isinstance(s, PatchableSocket)
+
+    s = make_socket_patchable(SSLContext().wrap_socket(socket()))
+    assert isinstance(s, SSLSocket)
+    assert not isinstance(s, PatchableSocket)

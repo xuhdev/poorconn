@@ -14,6 +14,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+from types import BuiltinMethodType
+from typing import Iterable
 from socket import socket
 
 
@@ -52,3 +54,25 @@ class PatchableSocket(socket):
     def sendall(self, *args, **kwargs):
         "Wraps :meth:`socket.socket.sendall` so this function is patchable."
         return super().sendall(*args, **kwargs)
+
+
+def make_socket_patchable(s: socket, funcs: Iterable[str] = (':sending', 'accept')) -> socket:
+    """Make a socket patchable: Create a :class:`.PatchableSocket` object if any functions in ``funcs`` are not
+    patchable.
+
+    :param s: The socket to be made patchable.
+    :param funcs: Create a :class:`.PatchableSocket` object if any functions in it are not patchable. ``':sending'``
+        means ``'send'`` and ``'sendall'``, and may include any additional sending methods in the future.
+    """
+
+    for func in funcs:
+        if func == ':sending':
+            fs: Iterable[str] = ('send', 'sendall')
+        else:
+            fs = (func,)
+
+        for f in fs:
+            if isinstance(getattr(s, f), BuiltinMethodType):
+                return PatchableSocket.create_from(s)
+
+    return s
