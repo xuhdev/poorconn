@@ -23,6 +23,14 @@ lint:
     - tox -vv -e lint
   interruptible: true
 
+dev:
+  image: "python:3.8"
+  script:
+    - pip install -U tox
+    - tox -vv -e dev
+    - . .tox/dev/bin/activate
+  interruptible: true
+
 .runtime:
   script:
     - python -V

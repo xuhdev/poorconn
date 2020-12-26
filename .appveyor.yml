@@ -17,10 +17,15 @@ environment:
   matrix:
     - TOXENV: py36
       PYTHON_VERSION: 3.6
+      PYTHON_HOME: "C:\\Python36-x64"
       APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2013"
     - TOXENV: py36
       PYTHON_VERSION: 3.6
       APPVEYOR_BUILD_WORKER_IMAGE: MacOS
+    - TOXENV: dev
+      PYTHON_VERSION: 3.7
+      PYTHON_HOME: "C:\\Python37"
+      APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2015"
 
 build: false
 
@@ -28,6 +33,8 @@ install:
   # AppVeyor requires us to manually source a virtualenv for non-Windows tests. This line is allowed to fail (and should
   # fail) on Windows images.
   - source ~/venv${PYTHON_VERSION}/bin/activate || (exit 0)
+  # Windows python path setup
+  - SET PATH=%PYTHON_HOME%;%PYTHON_HOME%\Scripts;%PATH% || (exit 0)
   - pip install -U tox
 
 test_script:
