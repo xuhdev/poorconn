@@ -15,7 +15,7 @@
 
 
 from types import BuiltinMethodType
-from typing import Iterable
+from typing import Iterable, no_type_check
 from socket import socket
 
 
@@ -43,14 +43,17 @@ class PatchableSocket(socket):
 
         return patchable_sock
 
+    @no_type_check
     def accept(self, *args, **kwargs):
         "Wraps :meth:`socket.socket.accept` so this function is patchable."
         return super().accept(*args, **kwargs)
 
+    @no_type_check
     def send(self, *args, **kwargs):
         "Wraps :meth:`socket.socket.send` so this function is patchable."
         return super().send(*args, **kwargs)
 
+    @no_type_check
     def sendall(self, *args, **kwargs):
         "Wraps :meth:`socket.socket.sendall` so this function is patchable."
         return super().sendall(*args, **kwargs)

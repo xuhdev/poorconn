@@ -16,17 +16,17 @@
 from socket import socket
 import time
 from types import BuiltinMethodType, MethodType
-from typing import Any, Callable
+from typing import Any, Callable, Dict, Sequence, Tuple
 
 from ._wrappers import wrap, wrap_accept, wrap_send
 
 from ._socket import PatchableSocket
 
 
-def delay_before_sending_once(s: socket, t: float):
+def delay_before_sending_once(s: socket, t: float) -> None:
     """Delay ``t`` seconds before sending for once (first time only).
 
-    :param s: The :class`socket.socket` object whose sending methods are to be delayed for once and once only.
+    :param s: The :class:`socket.socket` object whose sending methods are to be delayed for once and once only.
     :param t: Number of seconds to delay.
     """
 
@@ -35,7 +35,7 @@ def delay_before_sending_once(s: socket, t: float):
             self.t: float = t
             self._first_time: bool = True
 
-        def __call__(self, *args: Any, **kwargs: Any):
+        def __call__(self, *args: Any, **kwargs: Any) -> None:
             if self._first_time:
                 time.sleep(t)
                 self._first_time = False
@@ -57,7 +57,7 @@ def delay_before_sending(s: socket, t: float, length: int = 1024) -> None:
             self.t: float = t
             self.length: int = length
 
-        def __call__(self, sock: socket, *args: Any, **kwargs: Any):
+        def __call__(self, sock: socket, *args: Any, **kwargs: Any) -> Tuple[Tuple, Dict]:
             time.sleep(t)
             bytes_ = args[0] if len(args) > 0 else kwargs.get('bytes')  # Content of the bytes parameter from send
             flags = args[1] if len(args) > 1 else kwargs.get('flags')
@@ -83,15 +83,16 @@ def delay_before_sending(s: socket, t: float, length: int = 1024) -> None:
     s.sendall = MethodType(wrapping_function, s)  # type: ignore
 
 
-def wrap_sending_upon_acceptance(s: socket, wrapper: Callable, *args: Any, **kwargs: Any):
+def wrap_sending_upon_acceptance(s: socket, wrapper: Callable, *args: Any, **kwargs: Any) -> None:
     """Wrap sending functions of the connection socket returned by ``s.accept()``.
+
     :param s: The :class:`socket.socket` object where ``s.accept()``'s sending methods are to be wrapped.
     :param wrapper: The wrapper function.
     :param args: Positional parameters to be passed to the wrapper.
     :param kwargs: Keyword parameters to be passed to the wrapper.
     """
 
-    def after(s, *, original, before):
+    def after(s: socket, *, original: Sequence, before: Any) -> Tuple[Any, Any]:
         conn_sock = original[0]
         if isinstance(conn_sock.send, BuiltinMethodType) or \
            isinstance(conn_sock.sendall, BuiltinMethodType):  # conn_sock.send or conn_sock.sendall are not modifiable
@@ -102,7 +103,7 @@ def wrap_sending_upon_acceptance(s: socket, wrapper: Callable, *args: Any, **kwa
     wrap_accept(s, after=after)
 
 
-def delay_before_sending_upon_acceptance_once(s: socket, t: float):
+def delay_before_sending_upon_acceptance_once(s: socket, t: float) -> None:
     """Delay ``t`` seconds before sending for all sockets returned by ``s.accept()``, for once (first time only).
     Parameters mean the same as :func:`.delay_before_sending`.
     """
@@ -110,7 +111,7 @@ def delay_before_sending_upon_acceptance_once(s: socket, t: float):
     wrap_sending_upon_acceptance(s, delay_before_sending_once, t=t)
 
 
-def delay_before_sending_upon_acceptance(s: socket, t: float, length: int = 1024):
+def delay_before_sending_upon_acceptance(s: socket, t: float, length: int = 1024) -> None:
     """Delay ``t`` seconds before sending for all sockets returned by ``s.accept()``, for once (first time only).
     Parameters mean the same as :func:`.delay_before_sending`.
     """

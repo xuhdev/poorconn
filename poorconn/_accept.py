@@ -14,19 +14,20 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from socket import socket, SHUT_RDWR
+from typing import Any, Sequence
 
 from ._wrappers import wrap_accept
 
 
-def close_upon_accepting(s: socket):
+def close_upon_accepting(s: socket) -> None:
     """Shutdown and close the connection socket upon accepting.
 
     :param s: The :class`socket.socket` object whose ``accept()`` function is to be wrapped.
     """
 
-    def after(s, *, original, before):
+    def after(s: socket, *, original: Sequence, before: Any) -> Any:
         original[0].shutdown(SHUT_RDWR)
         original[0].close()
         return original
 
-    return wrap_accept(s, after=after)
+    wrap_accept(s, after=after)
