@@ -13,3 +13,7 @@ To run lint, run:
 To run tests, run:
 
     tox -e py36  # or py37, py38, py39, whichever you are using
+
+To generate documentation to `.tox/docs/_build/html`, run:
+
+    tox -e docs

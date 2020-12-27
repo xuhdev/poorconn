@@ -23,6 +23,13 @@ lint:
     - tox -vv -e lint
   interruptible: true
 
+docs:
+  image: "python:3.7"
+  script:
+    - pip install -U tox
+    - tox -vv -e docs
+  interruptible: true
+
 dev:
   image: "python:3.8"
   script:

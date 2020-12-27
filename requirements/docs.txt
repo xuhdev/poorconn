@@ -1,0 +1,2 @@
+autodocsumm == 0.2.2
+sphinx == 3.4.1
