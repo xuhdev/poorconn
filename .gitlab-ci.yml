@@ -54,25 +54,34 @@ pages:
     - master
 
 .runtime:
+  image: "python:3.${PYTHON_VERSION_MINOR}"
   script:
     - python -V
-    - export TOXENV=py$(python -V | cut -d' ' -f2 | cut -d. -f1,2 | sed 's/\.//'); echo TOXENV=$TOXENV
+    - export TOXENV=py3${PYTHON_VERSION_MINOR}; echo TOXENV=$TOXENV
     - pip install -U tox
     - tox -vv
   interruptible: true
+  # Upload coverage data
+  artifacts:
+    reports:
+      cobertura: .tox/py3${PYTHON_VERSION_MINOR}/coverage.xml
 
 runtime-3.6:
   extends: ".runtime"
-  image: "python:3.6"
+  variables:
+    PYTHON_VERSION_MINOR: "6"
 
 runtime-3.7:
   extends: ".runtime"
-  image: "python:3.7"
+  variables:
+    PYTHON_VERSION_MINOR: "7"
 
 runtime-3.8:
   extends: ".runtime"
-  image: "python:3.8"
+  variables:
+    PYTHON_VERSION_MINOR: "8"
 
 runtime-3.9:
   extends: ".runtime"
-  image: "python:3.9"
+  variables:
+    PYTHON_VERSION_MINOR: "9"
