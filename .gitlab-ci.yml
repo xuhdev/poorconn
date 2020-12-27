@@ -23,13 +23,6 @@ lint:
     - tox -vv -e lint
   interruptible: true
 
-docs:
-  image: "python:3.7"
-  script:
-    - pip install -U tox
-    - tox -vv -e docs
-  interruptible: true
-
 dev:
   image: "python:3.8"
   script:
@@ -37,6 +30,28 @@ dev:
     - tox -vv -e dev
     - . .tox/dev/bin/activate
   interruptible: true
+
+.docs:
+  image: "python:3.6"
+  script:
+    - pip install -U tox
+    - tox -vv -e docs
+    - mv .tox/docs/_build/html/ public
+  artifacts:
+    paths:
+    - public
+  interruptible: true
+
+docs:
+  extends: ".docs"
+  except:
+    - master
+
+pages:
+  extends: ".docs"
+  stage: deploy
+  only:
+    - master
 
 .runtime:
   script:
