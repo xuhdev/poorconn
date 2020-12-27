@@ -54,34 +54,56 @@ pages:
     - master
 
 .runtime:
-  image: "python:3.${PYTHON_VERSION_MINOR}"
+  image: "${PYTHON_IMAGE_PREFIX}${PYTHON_VERSION_MINOR}"
   script:
     - python -V
-    - export TOXENV=py3${PYTHON_VERSION_MINOR}; echo TOXENV=$TOXENV
+    - export TOXENV=${PYTHON_TOX_PREFIX}${PYTHON_VERSION_MINOR}; echo TOXENV=$TOXENV
     - pip install -U tox
     - tox -vv
   interruptible: true
   # Upload coverage data
   artifacts:
     reports:
-      cobertura: .tox/py3${PYTHON_VERSION_MINOR}/coverage.xml
+      cobertura: .tox/${PYTHON_TOX_PREFIX}${PYTHON_VERSION_MINOR}/coverage.xml
 
-runtime-3.6:
+.runtime-cpython:
   extends: ".runtime"
+  variables:
+    PYTHON_IMAGE_PREFIX: "python:3."
+    PYTHON_TOX_PREFIX: "py3"
+
+.runtime-pypy:
+  extends: ".runtime"
+  variables:
+    PYTHON_IMAGE_PREFIX: "pypy:3."
+    PYTHON_TOX_PREFIX: "pypy3"
+
+runtime-cpython-3.6:
+  extends: ".runtime-cpython"
   variables:
     PYTHON_VERSION_MINOR: "6"
 
-runtime-3.7:
-  extends: ".runtime"
+runtime-cpython-3.7:
+  extends: ".runtime-cpython"
   variables:
     PYTHON_VERSION_MINOR: "7"
 
-runtime-3.8:
-  extends: ".runtime"
+runtime-cpython-3.8:
+  extends: ".runtime-cpython"
   variables:
     PYTHON_VERSION_MINOR: "8"
 
-runtime-3.9:
-  extends: ".runtime"
+runtime-cpython-3.9:
+  extends: ".runtime-cpython"
   variables:
     PYTHON_VERSION_MINOR: "9"
+
+runtime-pypy-3.6:
+  extends: ".runtime-pypy"
+  variables:
+    PYTHON_VERSION_MINOR: "6"
+
+runtime-pypy-3.7:
+  extends: ".runtime-pypy"
+  variables:
+    PYTHON_VERSION_MINOR: "7"
