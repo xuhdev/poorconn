@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-
 from socket import socket
 import threading
 from typing import Any, Iterable, no_type_check
@@ -45,17 +44,17 @@ class PatchableSocket(socket):
 
     @no_type_check
     def accept(self, *args, **kwargs):
-        "Wraps :meth:`socket.socket.accept` so this function is patchable."
+        "Wraps :meth:`~socket.socket.accept` so that this function is patchable."
         return super().accept(*args, **kwargs)
 
     @no_type_check
     def send(self, *args, **kwargs):
-        "Wraps :meth:`socket.socket.send` so this function is patchable."
+        "Wraps :meth:`~socket.socket.send` so that this function is patchable."
         return super().send(*args, **kwargs)
 
     @no_type_check
     def sendall(self, *args, **kwargs):
-        "Wraps :meth:`socket.socket.sendall` so this function is patchable."
+        "Wraps :meth:`~socket.socket.sendall` so that this function is patchable."
         return super().sendall(*args, **kwargs)
 
 

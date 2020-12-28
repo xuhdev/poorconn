@@ -35,6 +35,8 @@ class DelayBeforeSendingOnceController:
 
     def __init__(self, t: float):
         self.t = t
+        """Same as ``t`` in :func:`delay_before_sending_once`. Updating it in the controller affects ``s`` in
+        :func:`delay_before_sending_once`."""
         self._first_time = True
 
     def reset(self) -> None:

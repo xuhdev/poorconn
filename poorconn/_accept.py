@@ -22,7 +22,7 @@ from ._wrappers import wrap_accept
 def close_upon_accepting(s: socket) -> None:
     """Shutdown and close the connection socket upon accepting.
 
-    :param s: The :class`socket.socket` object whose ``accept()`` function is to be wrapped.
+    :param s: The :class:`socket.socket` object whose ``accept()`` function is to be wrapped.
     """
 
     def after(s: socket, *, original: Sequence, before: Any) -> Any:

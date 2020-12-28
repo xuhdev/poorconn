@@ -5,6 +5,7 @@ Welcome to Poorconn's Documentation!
    :autosummary:
    :members:
    :imported-members:
+   :show-inheritance:
 
 Indices and Tables
 ==================

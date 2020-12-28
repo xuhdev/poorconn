@@ -34,13 +34,19 @@ extensions = [
 ]
 
 autodoc_member_order = 'groupwise'
+autodoc_typehints = 'description'
+
+autodoc_type_aliases = {
+    'DelayBeforeSendingOnceController': 'DelayBeforeSendingOnceController',
+    'PatchableSocket': 'PatchableSocket',
+}
 
 intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '.tox']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '.tox', 'tests', 'git']
 
 
 # -- Options for HTML output -------------------------------------------------
