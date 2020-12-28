@@ -20,7 +20,7 @@ from typing import Any, Callable, Dict, Sequence, Tuple
 
 from ._wrappers import wrap, wrap_accept, wrap_send
 
-from ._socket import PatchableSocket, is_patchable
+from ._socket import make_socket_patchable
 
 
 def delay_before_sending_once(s: socket, t: float) -> None:
@@ -94,8 +94,7 @@ def wrap_sending_upon_acceptance(s: socket, wrapper: Callable, *args: Any, **kwa
 
     def after(s: socket, *, original: Sequence, before: Any) -> Tuple[Any, Any]:
         conn_sock = original[0]
-        if not (is_patchable(conn_sock, 'send') and is_patchable(conn_sock, 'sendall')):
-            conn_sock = PatchableSocket.create_from(conn_sock)
+        conn_sock = make_socket_patchable(conn_sock, (':sending',))
         wrapper(conn_sock, *args, **kwargs)
         return conn_sock, original[1]
 
