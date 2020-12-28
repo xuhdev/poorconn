@@ -23,24 +23,58 @@ from ._wrappers import wrap, wrap_accept, wrap_send
 from ._socket import make_socket_patchable
 
 
-def delay_before_sending_once(s: socket, t: float) -> None:
+class DelayBeforeSendingOnceController:
+    """Controller for :func:`.delay_before_sending_once`. Objects are always created and returned by
+    :func:`.delay_before_sending_once` and should not be created outside the :mod:`poorconn` package.
+    """
+
+    __slots__ = (
+        't',
+        '_first_time'
+    )
+
+    def __init__(self, t: float):
+        self.t = t
+        self._first_time = True
+
+    def reset(self) -> None:
+        "Reset delay."
+        self._first_time = True
+
+    def _use(self) -> bool:
+        """Used internally to signal that delaying should start.
+
+        :return: True if delay is ready to start. False if delay has been started before and :meth:`.reset` has never
+        been called.
+        """
+        if self._first_time:
+            self._first_time = False
+            return True
+        else:
+            return False
+
+
+def delay_before_sending_once(s: socket, t: float) -> DelayBeforeSendingOnceController:
     """Delay ``t`` seconds before sending for once (first time only).
 
     :param s: The :class:`socket.socket` object whose sending methods are to be delayed for once and once only.
     :param t: Number of seconds to delay.
+    :return: A :class:`DelayBeforeSendingOnceController` object that controls the patched socket object.
     """
 
+    controller = DelayBeforeSendingOnceController(t)
+
     class DelayOnce():
-        def __init__(self, t: float):
-            self.t: float = t
-            self._first_time: bool = True
+        def __init__(self, controller: DelayBeforeSendingOnceController):
+            self._controller: DelayBeforeSendingOnceController = controller
 
         def __call__(self, *args: Any, **kwargs: Any) -> None:
-            if self._first_time:
+            if self._controller._use():
                 time.sleep(t)
-                self._first_time = False
 
-    wrap_send(s, before=DelayOnce(t))
+    wrap_send(s, before=DelayOnce(controller))
+
+    return controller
 
 
 def delay_before_sending(s: socket, t: float, length: int = 1024) -> None:

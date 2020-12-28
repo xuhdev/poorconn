@@ -60,19 +60,33 @@ def test_delay_before_sending_once(timeout):
 
                 # Second time should be quick
                 starting_time, ending_time = communicate()
-                assert ending_time - starting_time < 1
+                assert ending_time - starting_time < timeout / 5
 
                 # Patch the client side
                 client_sock = PatchableSocket.create_from(client_sock)
                 id_send = id(client_sock.send)
-                delay_before_sending_once(client_sock, t=timeout)
+                controller = delay_before_sending_once(client_sock, t=timeout)
                 assert id_send != id(client_sock.send)
-                starting_time = time.time()
-                num_bytes = client_sock.send(b'a' * 1024)
-                ending_time = time.time()
-                assert ending_time - starting_time > timeout
-                assert 0 < num_bytes <= 1024
-                assert client_sock.recv(num_bytes) == num_bytes * b'a'
+
+                for _ in range(2):
+                    # First time
+                    starting_time = time.time()
+                    num_bytes = client_sock.send(b'a' * 1024)
+                    ending_time = time.time()
+                    assert ending_time - starting_time > timeout
+                    assert 0 < num_bytes <= 1024
+                    assert client_sock.recv(num_bytes) == num_bytes * b'a'
+
+                    # Second time
+                    starting_time = time.time()
+                    num_bytes = client_sock.send(b'a' * 1024)
+                    ending_time = time.time()
+                    assert ending_time - starting_time < timeout / 5
+                    assert 0 < num_bytes <= 1024
+                    assert client_sock.recv(num_bytes) == num_bytes * b'a'
+
+                    controller.reset()  # reset at the end of the loop
+                    timeout = controller.t = timeout - 0.5  # Use a different timeout
 
 
 @pytest.mark.parametrize('chopped_length', (512, 800, 1024, 1600, 2048))
