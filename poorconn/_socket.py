@@ -14,9 +14,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from types import BuiltinMethodType
-from typing import Iterable, no_type_check
 from socket import socket
+import threading
+from typing import Any, Iterable, no_type_check
 
 
 class PatchableSocket(socket):
@@ -59,9 +59,31 @@ class PatchableSocket(socket):
         return super().sendall(*args, **kwargs)
 
 
+_patchability_thread_lock: threading.Lock = threading.Lock()
+
+
+def is_patchable(s: Any, attr: str) -> bool:
+    """Test whether ``s.attr`` is patchable.
+
+    :param s: The object.
+    :param attr: The name of the attribute.
+    :return: True if ``s.attr`` is patchable, False otherwise.
+    """
+    with _patchability_thread_lock:
+        cur_attr = getattr(s, attr)
+        try:
+            setattr(s, attr, 1)
+        except AttributeError:  # readonly attribute
+            return False
+        else:
+            setattr(s, attr, cur_attr)
+            return True
+
+
 def make_socket_patchable(s: socket, funcs: Iterable[str] = (':sending', 'accept')) -> socket:
     """Make a socket patchable: Create a :class:`.PatchableSocket` object if any functions in ``funcs`` are not
-    patchable.
+    patchable. This function is not thread-safe even if ``s`` is returned. Please ensure that no other threads are
+    operating on ``s`` during the execution of this function.
 
     :param s: The socket to be made patchable.
     :param funcs: Create a :class:`.PatchableSocket` object if any functions in it are not patchable. ``':sending'``
@@ -74,8 +96,7 @@ def make_socket_patchable(s: socket, funcs: Iterable[str] = (':sending', 'accept
         else:
             fs = (func,)
 
-        for f in fs:
-            if isinstance(getattr(s, f), BuiltinMethodType):
-                return PatchableSocket.create_from(s)
+        if not any(is_patchable(s, f) for f in fs):
+            return PatchableSocket.create_from(s)
 
     return s

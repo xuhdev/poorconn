@@ -15,12 +15,12 @@
 
 from socket import socket
 import time
-from types import BuiltinMethodType, MethodType
+from types import MethodType
 from typing import Any, Callable, Dict, Sequence, Tuple
 
 from ._wrappers import wrap, wrap_accept, wrap_send
 
-from ._socket import PatchableSocket
+from ._socket import PatchableSocket, is_patchable
 
 
 def delay_before_sending_once(s: socket, t: float) -> None:
@@ -94,8 +94,7 @@ def wrap_sending_upon_acceptance(s: socket, wrapper: Callable, *args: Any, **kwa
 
     def after(s: socket, *, original: Sequence, before: Any) -> Tuple[Any, Any]:
         conn_sock = original[0]
-        if isinstance(conn_sock.send, BuiltinMethodType) or \
-           isinstance(conn_sock.sendall, BuiltinMethodType):  # conn_sock.send or conn_sock.sendall are not modifiable
+        if not (is_patchable(conn_sock, 'send') and is_patchable(conn_sock, 'sendall')):
             conn_sock = PatchableSocket.create_from(conn_sock)
         wrapper(conn_sock, *args, **kwargs)
         return conn_sock, original[1]
