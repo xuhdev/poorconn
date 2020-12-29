@@ -24,7 +24,7 @@ lint:
   interruptible: true
 
 dev:
-  image: "python:3.8"
+  image: "python:3.7"
   script:
     - pip install -U tox
     - tox -vv -e dev
@@ -32,7 +32,8 @@ dev:
   interruptible: true
 
 .docs:
-  image: "python:3.6"
+  # Use Python 3.9+ because of https://github.com/sphinx-doc/sphinx/issues/8606#issuecomment-752095215
+  image: "python:3.9"
   script:
     - pip install -U tox
     - tox -vv -e docs
