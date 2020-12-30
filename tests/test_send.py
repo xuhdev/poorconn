@@ -174,11 +174,21 @@ def test_delay_before_sending_upon_acceptance(timeout, chopped_length):
         server_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         server_sock.bind(('localhost', 7999))
         id_accept = id(server_sock.accept)
-        delay_before_sending_upon_acceptance(server_sock, t=timeout, length=chopped_length)
-        server_sock.listen()
+        controller = delay_before_sending_upon_acceptance(server_sock, t=0.1, length=100)
+        # We use a different and small `t` (<< timeout) here so that `controller.t = timeout_` and its timeout
+        # assertions can be more reliably tested
+        assert timeout != 0.1  # sanity check
+        assert chopped_length != 100  # sanity check
+        assert controller.t == 0.1
+        assert controller.length == 100
 
         # Ensure that sending functions of ``server_sock`` has been wrapped
         assert id_accept != id(server_sock.accept)
+
+        server_sock.listen()
+
+        controller.t = timeout
+        controller.length = chopped_length
 
         with utils.echo_server_socket_new_thread(server_sock, timeout=timeout):
             with socket() as client_sock:

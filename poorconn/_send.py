@@ -183,6 +183,8 @@ class DelayBeforeSendingUponAcceptanceOnceController:
 def delay_before_sending_upon_acceptance_once(s: socket, t: float) -> DelayBeforeSendingUponAcceptanceOnceController:
     """Delay ``t`` seconds before sending for all sockets returned by ``s.accept()``, for once (first time only).
     Parameters mean the same as :func:`.delay_before_sending_once`.
+
+    :return: A :class:`DelayBeforeSendingUponAcceptanceOnceController` object that controls the patched socket object.
     """
 
     controller = DelayBeforeSendingUponAcceptanceOnceController(t=t)
@@ -190,9 +192,38 @@ def delay_before_sending_upon_acceptance_once(s: socket, t: float) -> DelayBefor
     return controller
 
 
-def delay_before_sending_upon_acceptance(s: socket, t: float, length: int = 1024) -> None:
-    """Delay ``t`` seconds before sending for all sockets returned by ``s.accept()``, for once (first time only).
-    Parameters mean the same as :func:`.delay_before_sending`.
+class DelayBeforeSendingUponAcceptanceController:
+    """Controller for :func:`.delay_before_sending_upon_acceptance`. Objects are always created and returned by
+    :func:`.delay_before_sending_upon_acceptance` and should not be created outside the :mod:`poorconn` package.
+
+    :param t: Same as ``t`` in :func:`delay_before_sending_upon_acceptance`.
+    :param length: Same as ``length`` in :func:`delay_before_sending_upon_acceptance`.
     """
 
-    wrap_sending_upon_acceptance(s, delay_before_sending, param_func=lambda: ((), {'t': t, 'length': length}))
+    __slots__ = (
+        't',
+        'length',
+    )
+
+    def __init__(self, t: float, length: int):
+        super().__init__()
+        self.t: float = t
+        """Same as ``t`` in :func:`delay_before_sending_upon_acceptance`. Updating it in the controller affects ``s`` in
+        :func:`delay_before_sending_upon_acceptance`."""
+        self.length: int = length
+        """Same as ``length`` in :func:`delay_before_sending_upon_acceptance`. Updating it in the controller affects
+        ``s`` in :func:`delay_before_sending_upon_acceptance`."""
+
+
+def delay_before_sending_upon_acceptance(s: socket, t: float,
+                                         length: int = 1024) -> DelayBeforeSendingUponAcceptanceController:
+    """Delay ``t`` seconds before sending for all sockets returned by ``s.accept()``, for once (first time only).
+    Parameters mean the same as :func:`.delay_before_sending`.
+
+    :return: A :class:`DelayBeforeSendingUponAcceptanceController` object that controls the patched socket object.
+    """
+
+    controller = DelayBeforeSendingUponAcceptanceController(t=t, length=length)
+    wrap_sending_upon_acceptance(s, delay_before_sending, param_func=lambda: ((), {'t': controller.t,
+                                                                                   'length': controller.length}))
+    return controller

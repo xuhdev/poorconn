@@ -16,6 +16,7 @@
 from ._accept import close_upon_accepting
 from ._send import (DelayBeforeSendingController,
                     DelayBeforeSendingOnceController,
+                    DelayBeforeSendingUponAcceptanceController,
                     DelayBeforeSendingUponAcceptanceOnceController,
                     delay_before_sending,
                     delay_before_sending_once,
