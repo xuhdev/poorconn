@@ -42,17 +42,18 @@ def test_delay_before_sending_once(timeout):
                 # Patch the client side
                 client_sock = PatchableSocket.create_from(client_sock)
                 id_send = id(client_sock.send)
-                # We use a different `t` (!= timeout) here so that `client_controller.t = timeout_` can be better tested
-                client_controller = delay_before_sending_once(client_sock, t=0.1)
+                # We use a different and small `t` (<< timeout) here so that `controller.t = timeout_` and its timeout
+                # assertions can be more reliably tested
+                controller = delay_before_sending_once(client_sock, t=0.1)
                 assert timeout != 0.1  # sanity check
-                assert client_controller.t == 0.1
+                assert controller.t == 0.1
                 assert id_send != id(client_sock.send)
 
                 client_sock.connect(('localhost', 7999))
 
                 def test_client(timeout_):
-                    client_controller.reset()
-                    client_controller.t = timeout_
+                    controller.reset()
+                    controller.t = timeout_
                     # First time
                     starting_time = time.time()
                     num_bytes = client_sock.send(b'a' * 1024)
@@ -80,8 +81,11 @@ def test_delay_before_sending_upon_acceptance_once(timeout):
         server_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         server_sock.bind(('localhost', 7999))
         id_accept = id(server_sock.accept)
-        server_controller = delay_before_sending_upon_acceptance_once(server_sock, t=timeout)
-        assert server_controller.t == timeout
+        # We use a different and small `t` (<< timeout) here so that `controller.t = timeout_` and its timeout
+        # assertions can be more reliably tested
+        controller = delay_before_sending_upon_acceptance_once(server_sock, t=0.1)
+        assert timeout != 0.1  # sanity check
+        assert controller.t == 0.1
 
         # Ensure that sending functions of ``server_sock`` has been wrapped
         assert id_accept != id(server_sock.accept)
@@ -91,7 +95,7 @@ def test_delay_before_sending_upon_acceptance_once(timeout):
         # Test the server side
         def test_server(timeout_):
             with utils.echo_server_socket_new_thread(server_sock, timeout=timeout):
-                server_controller.t = timeout_
+                controller.t = timeout_
                 with socket() as client_sock:
 
                     def communicate():
@@ -132,10 +136,12 @@ def test_delay_before_sending(timeout, chopped_length):
                 # Patch the client side
                 id_send = id(client_sock.send)
                 id_sendall = id(client_sock.sendall)
-                controller = delay_before_sending(client_sock, t=1, length=100)
-                assert timeout != 1  # sanity check
+                controller = delay_before_sending(client_sock, t=0.1, length=100)
+                # We use a different and small `t` (<< timeout) here so that `controller.t = timeout_` and its timeout
+                # assertions can be more reliably tested
+                assert timeout != 0.1  # sanity check
                 assert chopped_length != 100  # sanity check
-                assert controller.t == 1
+                assert controller.t == 0.1
                 assert controller.length == 100
                 assert id_send != id(client_sock.send)
                 assert id_sendall != id(client_sock.sendall)
