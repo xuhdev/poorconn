@@ -28,13 +28,14 @@ author = 'Hong Xu'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "pallets_sphinx_themes",
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'autodocsumm'
 ]
 
 autodoc_member_order = 'groupwise'
-autodoc_typehints = 'description'
+#autodoc_typehints = 'description'
 
 autodoc_type_aliases = {
     'DelayBeforeSendingOnceController': 'DelayBeforeSendingOnceController',
@@ -54,4 +55,4 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '.tox', 'tests', 'git']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'pocoo'
