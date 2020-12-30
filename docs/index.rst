@@ -1,11 +1,12 @@
 Welcome to Poorconn's Documentation!
 ====================================
 
-.. automodule:: poorconn
-   :autosummary:
-   :members:
-   :imported-members:
-   :show-inheritance:
+.. autosummary::
+   :toctree: apis
+   :recursive:
+   :template: poorconn-module.rst
+
+   poorconn
 
 Indices and Tables
 ==================

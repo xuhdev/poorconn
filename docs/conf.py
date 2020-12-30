@@ -30,12 +30,16 @@ author = 'Hong Xu'
 extensions = [
     "pallets_sphinx_themes",
     'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
-    'autodocsumm'
+    'autodocsumm',
 ]
 
+autosummary_generate = True
+autosummary_imported_members = True
+
 autodoc_member_order = 'groupwise'
-#autodoc_typehints = 'description'
+autodoc_typehints = 'description'
 
 autodoc_type_aliases = {
     'DelayBeforeSendingOnceController': 'DelayBeforeSendingOnceController',
@@ -56,3 +60,6 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '.tox', 'tests', 'git']
 # a list of builtin themes.
 #
 html_theme = 'pocoo'
+templates_path = ['_templates']
+html_static_path = ['_static']
+html_css_files = ['css/custom.css']
