@@ -30,7 +30,48 @@ import utils
 
 
 def test_delay_before_sending_once(timeout):
-    "Test :func:`poorconn.delay_before_sending_once` and :func:`poorconn.delay_before_sending_upon_acceptance_once`."
+    "Test :func:`poorconn.delay_before_sending_once`."
+
+    with socket() as server_sock:
+        server_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        server_sock.bind(('localhost', 7999))
+        server_sock.listen()
+        # Test the client side
+        with utils.echo_server_socket_new_thread(server_sock, timeout=timeout):
+            with socket() as client_sock:
+                # Patch the client side
+                client_sock = PatchableSocket.create_from(client_sock)
+                id_send = id(client_sock.send)
+                client_controller = delay_before_sending_once(client_sock, t=timeout)
+                assert id_send != id(client_sock.send)
+
+                client_sock.connect(('localhost', 7999))
+
+                def test_client(timeout_):
+                    client_controller.reset()
+                    client_controller.t = timeout_
+                    # First time
+                    starting_time = time.time()
+                    num_bytes = client_sock.send(b'a' * 1024)
+                    ending_time = time.time()
+                    assert ending_time - starting_time > timeout_
+                    assert 0 < num_bytes <= 1024
+                    assert client_sock.recv(num_bytes) == num_bytes * b'a'
+
+                    # Second time
+                    starting_time = time.time()
+                    num_bytes = client_sock.send(b'a' * 1024)
+                    ending_time = time.time()
+                    assert ending_time - starting_time < timeout_ / 5
+                    assert 0 < num_bytes <= 1024
+                    assert client_sock.recv(num_bytes) == num_bytes * b'a'
+
+                test_client(timeout_=timeout)
+                test_client(timeout_=timeout - 0.5)
+
+
+def test_delay_before_sending_upon_acceptance_once(timeout):
+    "Test :func:`poorconn.delay_before_sending_upon_acceptance_once`."
 
     with PatchableSocket() as server_sock:
         server_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
@@ -71,39 +112,6 @@ def test_delay_before_sending_once(timeout):
 
         test_server(timeout_=timeout)
         test_server(timeout_=timeout - 0.5)
-
-        # Test the client side
-        with utils.echo_server_socket_new_thread(server_sock, timeout=timeout):
-            with socket() as client_sock:
-                # Patch the client side
-                client_sock = PatchableSocket.create_from(client_sock)
-                id_send = id(client_sock.send)
-                client_controller = delay_before_sending_once(client_sock, t=timeout)
-                assert id_send != id(client_sock.send)
-
-                client_sock.connect(('localhost', 7999))
-
-                def test_client(timeout_):
-                    client_controller.reset()
-                    client_controller.t = timeout_
-                    # First time
-                    starting_time = time.time()
-                    num_bytes = client_sock.send(b'a' * 1024)
-                    ending_time = time.time()
-                    assert ending_time - starting_time > timeout_
-                    assert 0 < num_bytes <= 1024
-                    assert client_sock.recv(num_bytes) == num_bytes * b'a'
-
-                    # Second time
-                    starting_time = time.time()
-                    num_bytes = client_sock.send(b'a' * 1024)
-                    ending_time = time.time()
-                    assert ending_time - starting_time < timeout_ / 5
-                    assert 0 < num_bytes <= 1024
-                    assert client_sock.recv(num_bytes) == num_bytes * b'a'
-
-                test_client(timeout_=timeout)
-                test_client(timeout_=timeout - 0.5)
 
 
 @pytest.mark.parametrize('chopped_length', (512, 800, 1024, 1600, 2048))
