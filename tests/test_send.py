@@ -42,7 +42,10 @@ def test_delay_before_sending_once(timeout):
                 # Patch the client side
                 client_sock = PatchableSocket.create_from(client_sock)
                 id_send = id(client_sock.send)
-                client_controller = delay_before_sending_once(client_sock, t=timeout)
+                # We use a different `t` (!= timeout) here so that `client_controller.t = timeout_` can be better tested
+                client_controller = delay_before_sending_once(client_sock, t=0.1)
+                assert timeout != 0.1  # sanity check
+                assert client_controller.t == 0.1
                 assert id_send != id(client_sock.send)
 
                 client_sock.connect(('localhost', 7999))

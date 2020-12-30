@@ -61,10 +61,11 @@ def wrap_accept(s: socket, *,
 
 def wrap_send(s: socket, *,
               before: Optional[Callable[..., Any]] = None,
-              after: Optional[Callable[..., Any]] = None) -> None:
+              after: Optional[Callable[..., Any]] = None,
+              before_pass: bool = False) -> None:
     """Wrap :meth:`socket.socket.send`, :meth:`socket.socket.sendall`. This function calls :func:`.wrap` twice with
     ``meth='send'`` and ``meth='sendall'``.
     """
 
     for meth in ('send', 'sendall'):
-        wrap(s, meth=meth, before=before, after=after)
+        wrap(s, meth=meth, before=before, after=after, before_pass=before_pass)

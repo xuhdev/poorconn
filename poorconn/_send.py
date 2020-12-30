@@ -70,15 +70,11 @@ def delay_before_sending_once(s: socket, t: float) -> DelayBeforeSendingOnceCont
 
     controller = DelayBeforeSendingOnceController(t)
 
-    class DelayOnce():
-        def __init__(self, controller: DelayBeforeSendingOnceController):
-            self._controller: DelayBeforeSendingOnceController = controller
+    def before(*args: Any, **kwargs: Any) -> None:
+        if controller._use():
+            time.sleep(controller.t)
 
-        def __call__(self, *args: Any, **kwargs: Any) -> None:
-            if self._controller._use():
-                time.sleep(t)
-
-    wrap_send(s, before=DelayOnce(controller))
+    wrap_send(s, before=before, before_pass=False)
 
     return controller
 
