@@ -32,6 +32,7 @@ def test_close_upon_accepting(timeout):
         id_accept = id(server_sock.accept)
         close_upon_accepting(server_sock)
         assert id_accept != id(server_sock.accept)  # Ensure that the socket object is wrapped
+        server_sock.listen()
         with utils.echo_server_socket_new_thread(server_sock):
             with socket() as client_sock:
                 client_sock.connect(('localhost', 7999))

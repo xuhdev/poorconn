@@ -26,6 +26,8 @@ from ._socket import make_socket_patchable
 class DelayBeforeSendingOnceController:
     """Controller for :func:`.delay_before_sending_once`. Objects are always created and returned by
     :func:`.delay_before_sending_once` and should not be created outside the :mod:`poorconn` package.
+
+    :param t: Same as ``t`` in :func:`delay_before_sending_once`.
     """
 
     __slots__ = (
@@ -34,7 +36,8 @@ class DelayBeforeSendingOnceController:
     )
 
     def __init__(self, t: float):
-        self.t = t
+        super().__init__()
+        self.t: float = t
         """Same as ``t`` in :func:`delay_before_sending_once`. Updating it in the controller affects ``s`` in
         :func:`delay_before_sending_once`."""
         self._first_time = True
@@ -119,30 +122,51 @@ def delay_before_sending(s: socket, t: float, length: int = 1024) -> None:
     s.sendall = MethodType(wrapping_function, s)  # type: ignore
 
 
-def wrap_sending_upon_acceptance(s: socket, wrapper: Callable, *args: Any, **kwargs: Any) -> None:
+def wrap_sending_upon_acceptance(s: socket, wrapper: Callable, param_func: Callable[[], Tuple[Any, Any]]) -> None:
     """Wrap sending functions of the connection socket returned by ``s.accept()``.
 
     :param s: The :class:`socket.socket` object where ``s.accept()``'s sending methods are to be wrapped.
     :param wrapper: The wrapper function.
-    :param args: Positional parameters to be passed to the wrapper.
-    :param kwargs: Keyword parameters to be passed to the wrapper.
+    :param param_func: A function that returns a tuple ``(args, kwargs)``, where ``args`` are passed as positional
+         arguments to the wrapper and ``kwargs`` are passed as keyword parameters.
     """
 
     def after(s: socket, *, original: Sequence, before: Any) -> Tuple[Any, Any]:
         conn_sock = original[0]
         conn_sock = make_socket_patchable(conn_sock, (':sending',))
+        args, kwargs = param_func()
         wrapper(conn_sock, *args, **kwargs)
         return conn_sock, original[1]
 
     wrap_accept(s, after=after)
 
 
-def delay_before_sending_upon_acceptance_once(s: socket, t: float) -> None:
-    """Delay ``t`` seconds before sending for all sockets returned by ``s.accept()``, for once (first time only).
-    Parameters mean the same as :func:`.delay_before_sending`.
+class DelayBeforeSendingUponAcceptanceOnceController:
+    """Controller for :func:`.delay_before_sending_upon_acceptance_once`. Objects are always created and returned by
+    :func:`.delay_before_sending_upon_acceptance_once` and should not be created outside the :mod:`poorconn` package.
+
+    :param t: Same as ``t`` in :func:`delay_before_sending_upon_acceptance_once`.
     """
 
-    wrap_sending_upon_acceptance(s, delay_before_sending_once, t=t)
+    __slots__ = (
+        't',
+    )
+
+    def __init__(self, t: float):
+        super().__init__()
+        self.t: float = t
+        """Same as ``t`` in :func:`delay_before_sending_upon_acceptance_once`. Updating it in the controller affects
+        ``s`` in :func:`delay_before_sending_upon_acceptance_once`."""
+
+
+def delay_before_sending_upon_acceptance_once(s: socket, t: float) -> DelayBeforeSendingUponAcceptanceOnceController:
+    """Delay ``t`` seconds before sending for all sockets returned by ``s.accept()``, for once (first time only).
+    Parameters mean the same as :func:`.delay_before_sending_once`.
+    """
+
+    controller = DelayBeforeSendingUponAcceptanceOnceController(t=t)
+    wrap_sending_upon_acceptance(s, delay_before_sending_once, param_func=lambda: ((), {'t': controller.t}))
+    return controller
 
 
 def delay_before_sending_upon_acceptance(s: socket, t: float, length: int = 1024) -> None:
@@ -150,4 +174,4 @@ def delay_before_sending_upon_acceptance(s: socket, t: float, length: int = 1024
     Parameters mean the same as :func:`.delay_before_sending`.
     """
 
-    wrap_sending_upon_acceptance(s, delay_before_sending, t=t, length=length)
+    wrap_sending_upon_acceptance(s, delay_before_sending, param_func=lambda: ((), {'t': t, 'length': length}))

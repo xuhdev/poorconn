@@ -22,12 +22,13 @@ import threading
 
 @contextmanager
 def echo_server_socket_new_thread(sock: socket.socket, timeout=None):
-    "Start a server socket in a new thread that accepts a connection, and then sends back whatever it receives."
+    """Start a server socket (which has called ``sock.listen()``) in a new thread that accepts a connection, and then
+    sends back whatever it receives. It only calls ``sock.accept()`` once.
+    """
 
     stop = False
 
     def server_socket_work():
-        sock.listen()
         conn, addr = sock.accept()
         conn.settimeout(timeout)
         while not stop:

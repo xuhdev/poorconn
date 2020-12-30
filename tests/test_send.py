@@ -36,44 +36,61 @@ def test_delay_before_sending_once(timeout):
         server_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         server_sock.bind(('localhost', 7999))
         id_accept = id(server_sock.accept)
-        delay_before_sending_upon_acceptance_once(server_sock, t=timeout)
+        server_controller = delay_before_sending_upon_acceptance_once(server_sock, t=timeout)
+        assert server_controller.t == timeout
 
         # Ensure that sending functions of ``server_sock`` has been wrapped
         assert id_accept != id(server_sock.accept)
 
+        server_sock.listen()
+
+        # Test the server side
+        def test_server(timeout_):
+            with utils.echo_server_socket_new_thread(server_sock, timeout=timeout):
+                server_controller.t = timeout_
+                with socket() as client_sock:
+
+                    def communicate():
+                        sent_content = b'poorconn'
+                        starting_time = time.time()
+                        client_sock.sendall(sent_content)
+                        recved_content = utils.recv_until(client_sock, len(sent_content))
+                        ending_time = time.time()
+                        assert sent_content == recved_content
+                        return starting_time, ending_time
+
+                    client_sock.connect(('localhost', 7999))
+
+                    # First time is slow
+                    starting_time, ending_time = communicate()
+                    assert ending_time - starting_time > timeout_
+
+                    # Second time should be quick
+                    starting_time, ending_time = communicate()
+                    assert ending_time - starting_time < timeout_ / 5
+
+        test_server(timeout_=timeout)
+        test_server(timeout_=timeout - 0.5)
+
+        # Test the client side
         with utils.echo_server_socket_new_thread(server_sock, timeout=timeout):
             with socket() as client_sock:
-                client_sock.connect(('localhost', 7999))
-
-                def communicate():
-                    sent_content = b'poorconn'
-                    starting_time = time.time()
-                    client_sock.sendall(sent_content)
-                    recved_content = client_sock.recv(128)
-                    ending_time = time.time()
-                    assert sent_content == recved_content
-                    return starting_time, ending_time
-
-                # First time is slow
-                starting_time, ending_time = communicate()
-                assert ending_time - starting_time > timeout
-
-                # Second time should be quick
-                starting_time, ending_time = communicate()
-                assert ending_time - starting_time < timeout / 5
-
                 # Patch the client side
                 client_sock = PatchableSocket.create_from(client_sock)
                 id_send = id(client_sock.send)
-                controller = delay_before_sending_once(client_sock, t=timeout)
+                client_controller = delay_before_sending_once(client_sock, t=timeout)
                 assert id_send != id(client_sock.send)
 
-                for _ in range(2):
+                client_sock.connect(('localhost', 7999))
+
+                def test_client(timeout_):
+                    client_controller.reset()
+                    client_controller.t = timeout_
                     # First time
                     starting_time = time.time()
                     num_bytes = client_sock.send(b'a' * 1024)
                     ending_time = time.time()
-                    assert ending_time - starting_time > timeout
+                    assert ending_time - starting_time > timeout_
                     assert 0 < num_bytes <= 1024
                     assert client_sock.recv(num_bytes) == num_bytes * b'a'
 
@@ -81,12 +98,12 @@ def test_delay_before_sending_once(timeout):
                     starting_time = time.time()
                     num_bytes = client_sock.send(b'a' * 1024)
                     ending_time = time.time()
-                    assert ending_time - starting_time < timeout / 5
+                    assert ending_time - starting_time < timeout_ / 5
                     assert 0 < num_bytes <= 1024
                     assert client_sock.recv(num_bytes) == num_bytes * b'a'
 
-                    controller.reset()  # reset at the end of the loop
-                    timeout = controller.t = timeout - 0.5  # Use a different timeout
+                test_client(timeout_=timeout)
+                test_client(timeout_=timeout - 0.5)
 
 
 @pytest.mark.parametrize('chopped_length', (512, 800, 1024, 1600, 2048))
@@ -96,6 +113,7 @@ def test_delay_before_sending(timeout, chopped_length):
     with socket() as server_sock:
         server_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         server_sock.bind(('localhost', 7999))
+        server_sock.listen()
 
         with utils.echo_server_socket_new_thread(server_sock, timeout=timeout):
             with PatchableSocket() as client_sock:
@@ -133,6 +151,7 @@ def test_delay_before_sending_upon_acceptance(timeout, chopped_length):
         server_sock.bind(('localhost', 7999))
         id_accept = id(server_sock.accept)
         delay_before_sending_upon_acceptance(server_sock, t=timeout, length=chopped_length)
+        server_sock.listen()
 
         # Ensure that sending functions of ``server_sock`` has been wrapped
         assert id_accept != id(server_sock.accept)
