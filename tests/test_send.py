@@ -129,9 +129,16 @@ def test_delay_before_sending(timeout, chopped_length):
                 # Patch the client side
                 id_send = id(client_sock.send)
                 id_sendall = id(client_sock.sendall)
-                delay_before_sending(client_sock, t=timeout, length=chopped_length)
+                controller = delay_before_sending(client_sock, t=1, length=100)
+                assert timeout != 1  # sanity check
+                assert chopped_length != 100  # sanity check
+                assert controller.t == 1
+                assert controller.length == 100
                 assert id_send != id(client_sock.send)
                 assert id_sendall != id(client_sock.sendall)
+
+                controller.t = timeout
+                controller.length = chopped_length
 
                 for _ in range(3):  # Run 3 times
                     starting_time = time.time()

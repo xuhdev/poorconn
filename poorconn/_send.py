@@ -64,6 +64,7 @@ def delay_before_sending_once(s: socket, t: float) -> DelayBeforeSendingOnceCont
 
     :param s: The :class:`socket.socket` object whose sending methods are to be delayed for once and once only.
     :param t: Number of seconds to delay.
+
     :return: A :class:`DelayBeforeSendingOnceController` object that controls the patched socket object.
     """
 
@@ -82,28 +83,50 @@ def delay_before_sending_once(s: socket, t: float) -> DelayBeforeSendingOnceCont
     return controller
 
 
-def delay_before_sending(s: socket, t: float, length: int = 1024) -> None:
+class DelayBeforeSendingController:
+    """Controller for :func:`.delay_before_sending`. Objects are always created and returned by
+    :func:`.delay_before_sending` and should not be created outside the :mod:`poorconn` package.
+
+    :param t: Same as ``t`` in :func:`delay_before_sending`.
+    :param length: Same as ``length`` in :func:`delay_before_sending`.
+    """
+
+    __slots__ = (
+        't',
+        'length',
+    )
+
+    def __init__(self, t: float, length: int):
+        super().__init__()
+        self.t: float = t
+        """Same as ``t`` in :func:`delay_before_sending`. Updating it in the controller affects ``s`` in
+        :func:`delay_before_sending`."""
+        self.length: int = length
+        """Same as ``length`` in :func:`delay_before_sending`. Updating it in the controller affects ``s`` in
+        :func:`delay_before_sending`."""
+
+
+def delay_before_sending(s: socket, t: float, length: int = 1024) -> DelayBeforeSendingController:
     """Chop the content (``bytes`` in :meth:`socket.socket.send` and :meth:`socket.socket.sendall`) to be sent in
     ``length`` bytes and delay ``t`` seconds before sending every time.
 
     :param s: The :class:`socket.socket` object whose sending methods are to be delayed every time.
     :param t: Number of seconds to delay.
     :param length: Number of bytes of each of the slices into which the content is chopped.
+
+    :return: A :class:`DelayBeforeSendingController` object that controls the patched socket object.
     """
 
-    class DelaySendEveryTime:
-        def __init__(self, t: float, length: int):
-            self.t: float = t
-            self.length: int = length
+    controller = DelayBeforeSendingController(t=t, length=length)
 
-        def __call__(self, sock: socket, *args: Any, **kwargs: Any) -> Tuple[Tuple, Dict]:
-            time.sleep(t)
-            bytes_ = args[0] if len(args) > 0 else kwargs.get('bytes')  # Content of the bytes parameter from send
-            flags = args[1] if len(args) > 1 else kwargs.get('flags')
-            return (bytes_[:min(length, len(bytes_))],) + ((flags,) if flags is not None else ()), {}
+    def before(sock: socket, *args: Any, **kwargs: Any) -> Tuple[Tuple, Dict]:
+        time.sleep(controller.t)
+        bytes_ = args[0] if len(args) > 0 else kwargs.get('bytes')  # Content of the bytes parameter from send
+        flags = args[1] if len(args) > 1 else kwargs.get('flags')
+        return (bytes_[:min(controller.length, len(bytes_))],) + ((flags,) if flags is not None else ()), {}
 
     # For send, simply truncate the length of the content to be sent to ``length`` and delay that by ``t`` seconds.
-    wrap(s, meth='send', before=DelaySendEveryTime(t, length), before_pass=True)
+    wrap(s, meth='send', before=before, before_pass=True)
     wrapped_sendall = s.sendall
 
     # The functions that wraps sendall
@@ -111,15 +134,17 @@ def delay_before_sending(s: socket, t: float, length: int = 1024) -> None:
         bytes_ = args[0] if len(args) > 0 else kwargs.get('bytes')  # Content of the bytes parameter from send
         flags = args[1] if len(args) > 1 else kwargs.get('flags')   # flags parameter
 
-        for i in range(0, len(bytes_), length):
-            time.sleep(t)
+        for i in range(0, len(bytes_), controller.length):
+            time.sleep(controller.t)
             begin = i
-            end = min(len(bytes_), i + length)
+            end = min(len(bytes_), i + controller.length)
             args = (bytes_[begin:end],) + ((flags,) if flags is not None else ())
             wrapped_sendall(*args)
 
     # See https://github.com/python/mypy/issues/2427#issuecomment-480263443 for the type ignoring below
     s.sendall = MethodType(wrapping_function, s)  # type: ignore
+
+    return controller
 
 
 def wrap_sending_upon_acceptance(s: socket, wrapper: Callable, param_func: Callable[[], Tuple[Any, Any]]) -> None:

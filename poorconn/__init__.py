@@ -14,7 +14,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from ._accept import close_upon_accepting
-from ._send import (DelayBeforeSendingOnceController,
+from ._send import (DelayBeforeSendingController,
+                    DelayBeforeSendingOnceController,
+                    DelayBeforeSendingUponAcceptanceOnceController,
                     delay_before_sending,
                     delay_before_sending_once,
                     delay_before_sending_upon_acceptance,
