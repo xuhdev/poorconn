@@ -58,6 +58,7 @@
 .. autosummary::
    :toctree:
    :recursive:
+   :template: poorconn-module.rst
 {% for item in modules %}
    {{ item }}
 {%- endfor %}

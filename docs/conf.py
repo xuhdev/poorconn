@@ -46,7 +46,8 @@ autodoc_type_aliases = {
     'PatchableSocket': 'PatchableSocket',
 }
 
-intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
+intersphinx_mapping = {'pytest': ('https://docs.pytest.org/en/stable/', None),
+                       'python': ('https://docs.python.org/3', None)}
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

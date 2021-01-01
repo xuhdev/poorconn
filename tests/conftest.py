@@ -1,4 +1,4 @@
-# Copyright (C) 2020  Hong Xu <hong@topbug.net>
+# Copyright (C) 2020--2021  Hong Xu <hong@topbug.net>
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -23,6 +23,8 @@ import pytest
 
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
+
+pytest_plugins = ["pytester"]
 
 
 @pytest.fixture

@@ -3,10 +3,10 @@ Welcome to Poorconn's Documentation!
 
 .. autosummary::
    :toctree: apis
-   :recursive:
    :template: poorconn-module.rst
 
    poorconn
+   poorconn.pytest_plugin
 
 Indices and Tables
 ==================
