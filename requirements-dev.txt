@@ -1,4 +1,5 @@
 tox
+-r requirements/deptools.txt
+-r requirements/docs.txt
 -r requirements/lint.txt
 -r requirements/test.txt
--r requirements/docs.txt

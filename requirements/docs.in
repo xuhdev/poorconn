@@ -1,0 +1,4 @@
+# Doc building dependencies
+autodocsumm
+sphinx
+pallets-sphinx-themes
