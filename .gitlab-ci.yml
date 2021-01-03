@@ -58,8 +58,10 @@ pages:
   image: "${PYTHON_IMAGE_PREFIX}${PYTHON_VERSION_MINOR}"
   script:
     - python -V
-    - export TOXENV=${PYTHON_TOX_PREFIX}${PYTHON_VERSION_MINOR}; echo TOXENV=$TOXENV
     - pip install -U tox
+    - export TOXENV=${PYTHON_TOX_PREFIX}${PYTHON_VERSION_MINOR}; echo TOXENV=$TOXENV
+    - tox -vv
+    - export TOXENV=${PYTHON_TOX_PREFIX}${PYTHON_VERSION_MINOR}-sanity; echo TOXENV=$TOXENV
     - tox -vv
   interruptible: true
   # Upload coverage data
