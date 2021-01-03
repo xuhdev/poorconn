@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import pathlib

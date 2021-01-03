@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from __future__ import annotations
+
 from socket import socket
 import threading
 from typing import Any, Iterable, no_type_check
@@ -25,7 +27,7 @@ class PatchableSocket(socket):
     """
 
     @classmethod
-    def create_from(cls, s: socket) -> 'PatchableSocket':
+    def create_from(cls, s: socket) -> PatchableSocket:
         """Create a :class:`PatchableSocket` object from ``s``.
 
         :param s: The :class:`socket.socket` object to be created from.
