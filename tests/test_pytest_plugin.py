@@ -15,7 +15,7 @@
 
 from textwrap import dedent
 
-from poorconn._pytest_plugin import _DEFAULT_PORT
+from poorconn.pytest_plugin._impl import _DEFAULT_PORT
 
 pytest_plugins = ["pytester"]
 

@@ -15,4 +15,4 @@
 
 ":mod:`pytest` plugin."
 
-from ._pytest_plugin import Server, poorconn_http_server, pytest_configure
+from ._impl import Server, poorconn_http_server, pytest_configure
