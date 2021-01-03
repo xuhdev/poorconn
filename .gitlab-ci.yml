@@ -79,11 +79,6 @@ pages:
     PYTHON_IMAGE_PREFIX: "pypy:3."
     PYTHON_TOX_PREFIX: "pypy3"
 
-runtime-cpython-3.6:
-  extends: ".runtime-cpython"
-  variables:
-    PYTHON_VERSION_MINOR: "6"
-
 runtime-cpython-3.7:
   extends: ".runtime-cpython"
   variables:
@@ -98,11 +93,6 @@ runtime-cpython-3.9:
   extends: ".runtime-cpython"
   variables:
     PYTHON_VERSION_MINOR: "9"
-
-runtime-pypy-3.6:
-  extends: ".runtime-pypy"
-  variables:
-    PYTHON_VERSION_MINOR: "6"
 
 runtime-pypy-3.7:
   extends: ".runtime-pypy"

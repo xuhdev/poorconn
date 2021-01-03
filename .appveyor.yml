@@ -15,16 +15,16 @@
 
 environment:
   matrix:
-    - TOXENV: py36
-      PYTHON_VERSION: 3.6
-      PYTHON_HOME: "C:\\Python36-x64"
+    - TOXENV: py37
+      PYTHON_VERSION: 3.7
+      PYTHON_HOME: "C:\\Python37-x64"
       APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2013"
-    - TOXENV: py36
-      PYTHON_VERSION: 3.6
+    - TOXENV: py37
+      PYTHON_VERSION: 3.7
       APPVEYOR_BUILD_WORKER_IMAGE: MacOS
     - TOXENV: dev
-      PYTHON_VERSION: 3.7
-      PYTHON_HOME: "C:\\Python37"
+      PYTHON_VERSION: 3.8
+      PYTHON_HOME: "C:\\Python38"
       APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2015"
 
 build: false
