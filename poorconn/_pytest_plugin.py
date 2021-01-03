@@ -16,6 +16,7 @@
 from dataclasses import dataclass
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import pathlib
+import socket
 from socketserver import BaseServer
 import threading
 from typing import Any, Iterator, no_type_check
@@ -51,9 +52,24 @@ class _HTTPServer(HTTPServer):
     def serve_forever_new_thread(self) -> threading.Thread:
         "Serve forever, but in a new thread."
 
+        # [NOTE SO_REUSEADDR]
+        # With SO_REUSEADDR, multiple sockets on Windows can listen on the same
+        # ports and cause undetermined behaviors. Use SO_EXCLUSIVEADDRUSE to
+        # prevent this. See
+        # https://docs.microsoft.com/en-us/windows/win32/winsock/using-so-reuseaddr-and-so-exclusiveaddruse
+        if hasattr(socket, 'SO_EXCLUSIVEADDRUSE'):  # pragma: no cover, Windows-only
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        else:  # pragma: no cover
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         thread = threading.Thread(target=self.serve_forever, name='Http server on a new thread', daemon=True)
         thread.start()
         return thread
+
+
+if hasattr(socket, 'SO_EXCLUSIVEADDRUSE'):  # pragma: no cover, Windows-only
+    _HTTPServer.allow_reuse_address = False
+else:  # pragma: no cover
+    _HTTPServer.allow_reuse_address = True
 
 
 _DEFAULT_PORT: int = 8080

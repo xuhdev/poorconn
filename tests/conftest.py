@@ -16,6 +16,7 @@
 
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import os
+import socket
 import sys
 
 import pytest
@@ -23,17 +24,26 @@ import pytest
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
 
+import utils  # noqa: E402
+
 
 @pytest.fixture
 def http_server() -> HTTPServer:
-    """A clean HTTPServer object that listens on localhost:8000. It also turns on ``SO_REUSEADDR`` for the underlying
-    socket object.
+    """A clean HTTPServer object that listens on localhost:8000. It also turns on ``SO_REUSEADDR`` (and also
+    ``SO_EXCLUSIVEADDRUSE`` on Windows) for the underlying socket object.
     """
 
     class _HTTPServer(HTTPServer):
-        allow_reuse_address = True
+        pass
+
+    # See [NOTE SO_REUSEADDR]
+    if hasattr(socket, 'SO_EXCLUSIVEADDRUSE'):  # Windows-only
+        _HTTPServer.allow_reuse_address = False
+    else:
+        _HTTPServer.allow_reuse_address = True
 
     with _HTTPServer(("localhost", 8000), SimpleHTTPRequestHandler) as httpd:
+        utils.set_server_socket_options(httpd.socket)
         yield httpd
         httpd.shutdown()
 

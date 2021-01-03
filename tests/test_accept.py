@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from socket import socket, SO_REUSEADDR, SOL_SOCKET
+from socket import socket
 
 import pytest
 import requests
@@ -27,7 +27,7 @@ def test_close_upon_accepting(timeout):
     "Test :func:`poorconn.close_upon_accepting` with ``HTTPServer``."
 
     with PatchableSocket() as server_sock:
-        server_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        utils.set_server_socket_options(server_sock)
         server_sock.bind(('localhost', 7999))
         id_accept = id(server_sock.accept)
         close_upon_accepting(server_sock)

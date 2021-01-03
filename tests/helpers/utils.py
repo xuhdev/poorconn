@@ -65,3 +65,13 @@ def recv_until(s: socket.socket, num_bytes: int) -> bytes:
         recved_bytes += len(new_content)
         content += new_content
     return content
+
+
+def set_server_socket_options(s: socket.socket) -> None:
+    "Set the most common server socket options: SO_EXCLUSIVEADDRUSE on Windows and SO_REUSEADDR on POSIX."
+
+    # See [NOTE SO_REUSEADDR]
+    if hasattr(socket, 'SO_EXCLUSIVEADDRUSE'):  # Windows-only
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+    else:
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

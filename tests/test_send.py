@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pathlib
-from socket import socket, SO_REUSEADDR, SOL_SOCKET
+from socket import socket
 import time
 
 import pytest
@@ -33,7 +33,7 @@ def test_delay_before_sending_once(timeout):
     "Test :func:`poorconn.delay_before_sending_once`."
 
     with socket() as server_sock:
-        server_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        utils.set_server_socket_options(server_sock)
         server_sock.bind(('localhost', 7999))
         server_sock.listen()
         # Test the client side
@@ -78,7 +78,7 @@ def test_delay_before_sending_upon_acceptance_once(timeout):
     "Test :func:`poorconn.delay_before_sending_upon_acceptance_once`."
 
     with PatchableSocket() as server_sock:
-        server_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        utils.set_server_socket_options(server_sock)
         server_sock.bind(('localhost', 7999))
         id_accept = id(server_sock.accept)
         # We use a different and small `t` (<< timeout) here so that `controller.t = timeout_` and its timeout
@@ -126,7 +126,7 @@ def test_delay_before_sending(timeout, chopped_length):
     "Test :func:`poorconn.delay_before_sending`. Client always tries to send 1024 bytes every time."
 
     with socket() as server_sock:
-        server_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        utils.set_server_socket_options(server_sock)
         server_sock.bind(('localhost', 7999))
         server_sock.listen()
 
@@ -171,7 +171,7 @@ def test_delay_before_sending_upon_acceptance(timeout, chopped_length):
     "Test :func:`poorconn.delay_before_sending_upon_acceptance`. Client always tries to send 1024 bytes every time."
 
     with PatchableSocket() as server_sock:
-        server_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        utils.set_server_socket_options(server_sock)
         server_sock.bind(('localhost', 7999))
         id_accept = id(server_sock.accept)
         controller = delay_before_sending_upon_acceptance(server_sock, t=0.1, length=100)
