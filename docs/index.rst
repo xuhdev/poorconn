@@ -17,11 +17,11 @@ If you use :mod:`pytest`:
    import time
    import requests
 
-   def test_slow_http_server(poorconn_http_server, poorconn_http_url):
+   def test_slow_http_server(poorconn_http_server):
        "Test on a slow http server."
-       Path('index.txt').write_text('Hello, poorconn!')
+       (tmp_path / 'index.txt').write_text('Hello, poorconn!')
        starting_time = time.time()
-       content = requests.get(f'{poorconn_http_url}/index.txt').content
+       content = requests.get(f'{poorconn_http_server.url}/index.txt').content
        ending_time = time.time()
        assert ending_time - starting_time > 1
 

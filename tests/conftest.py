@@ -16,15 +16,12 @@
 
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import os
-from socket import SO_REUSEADDR, SOL_SOCKET
 import sys
 
 import pytest
 
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
-
-pytest_plugins = ["pytester"]
 
 
 @pytest.fixture
@@ -33,8 +30,10 @@ def http_server() -> HTTPServer:
     socket object.
     """
 
-    with HTTPServer(("localhost", 8000), SimpleHTTPRequestHandler) as httpd:
-        httpd.socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+    class _HTTPServer(HTTPServer):
+        allow_reuse_address = True
+
+    with _HTTPServer(("localhost", 8000), SimpleHTTPRequestHandler) as httpd:
         yield httpd
         httpd.shutdown()
 

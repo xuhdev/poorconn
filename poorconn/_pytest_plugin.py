@@ -13,34 +13,81 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from dataclasses import dataclass
 from http.server import HTTPServer, SimpleHTTPRequestHandler
+import pathlib
+from socketserver import BaseServer
 import threading
-from typing import Iterator
+from typing import Any, Iterator, no_type_check
 
 import pytest
 
 from poorconn import delay_before_sending_upon_acceptance, make_socket_patchable
 
 
-@pytest.fixture(scope='session')
-def poorconn_http_server() -> Iterator[HTTPServer]:
-    """A simple session-wide HTTPServer object. It listens on localhost:8080 by default. It's socket is slowed down with
-    :func:`poorconn.delay_before_sending`.
-    """
+# The type of ``config`` is private to pytest
+@no_type_check
+def pytest_configure(config) -> None:
+    # register markers
+    config.addinivalue_line(
+        "markers", "poorconn_http_server_config(address, port): Configure fixture ``poorconn_http_server``."
+    )
 
-    with HTTPServer(("localhost", 8080), SimpleHTTPRequestHandler) as httpd:
+
+@dataclass(frozen=True)
+class Server:
+    "The return type of many fixtures. It describes a server object and the URL to access it."
+    server: BaseServer
+    "A :class:`socketserver.BaseServer` object."
+    url: str
+    "The URL to the root of :attr:`~.Server.server`."
+
+
+class _HTTPServer(HTTPServer):
+    "Our inherited :class:`HTTPServer` class that allows reusing address."
+
+    allow_reuse_address: bool = True
+
+    def serve_forever_new_thread(self) -> threading.Thread:
+        "Serve forever, but in a new thread."
+
+        thread = threading.Thread(target=self.serve_forever, name='Http server on a new thread', daemon=True)
+        thread.start()
+        return thread
+
+
+_DEFAULT_PORT: int = 8080
+_LOCALHOST: str = 'localhost'
+
+
+@pytest.fixture
+def poorconn_http_server(tmp_path: pathlib.Path, request: pytest.FixtureRequest) -> Iterator[Server]:
+    """A simple session-wide HTTPServer object on a new thread. By default, it listens on ``localhost``, and tries ports
+    from 8080 incrementally until a port that it can use. It's socket is slowed down with
+    :func:`poorconn.delay_before_sending`. It serves :func:`tmp_path` as the root directory.
+    """
+    class Handler(SimpleHTTPRequestHandler):
+        def __init__(self, *args: Any, directory: pathlib.Path = tmp_path, **kwargs: Any):
+            # The following type ignore is because of https://github.com/python/mypy/issues/6799
+            super().__init__(*args, directory=directory, **kwargs)  # type: ignore[misc]
+
+    # Extract options from markers
+    config = request.node.get_closest_marker('poorconn_http_server_config')
+    if config is not None:
+        options = config.kwargs
+    else:
+        options = {}
+    port = options.get('port', _DEFAULT_PORT)
+    address = options.get('address', _LOCALHOST)
+
+    with _HTTPServer((address, port), Handler) as httpd:
         httpd.socket = make_socket_patchable(httpd.socket)
         delay_before_sending_upon_acceptance(httpd.socket, t=1, length=1024)
-        thread = threading.Thread(target=httpd.serve_forever, name='Http server on a new thread', daemon=True)
-        thread.start()
         # Type ignored due to https://github.com/python/typeshed/pull/4882
         # TODO: Remove this type ignore when a new mypy release is out
-        yield httpd  # type: ignore
+        thread = httpd.serve_forever_new_thread()  # type: ignore
+        yield Server(server=httpd, url=f'http://{httpd.server_address[0]}:{httpd.server_address[1]}')
         httpd.shutdown()
 
-
-@pytest.fixture(scope='session')
-def poorconn_http_url(poorconn_http_server: HTTPServer) -> str:
-    "The URL to the root of :func:`poorconn_http_server`."
-
-    return f'http://{poorconn_http_server.server_address[0]}:{poorconn_http_server.server_address[1]}'
+    # Wait until httpd has been closed
+    thread.join()
