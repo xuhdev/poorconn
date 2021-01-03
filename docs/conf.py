@@ -32,7 +32,6 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
-    'autodocsumm',
 ]
 
 autosummary_generate = True

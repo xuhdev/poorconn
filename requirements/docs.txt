@@ -6,8 +6,6 @@
 #
 alabaster==0.7.12
     # via sphinx
-autodocsumm==0.2.2
-    # via -r docs.in
 babel==2.9.0
     # via sphinx
 certifi==2020.12.5
@@ -45,7 +43,6 @@ snowballstemmer==2.0.0
 sphinx==3.4.1
     # via
     #   -r docs.in
-    #   autodocsumm
     #   pallets-sphinx-themes
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
