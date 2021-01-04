@@ -21,14 +21,16 @@ If you use `pytest`_:
    from pathlib import Path
    import time
    import requests
+   import pytest
 
-   def test_slow_http_server(poorconn_http_server):
-       "Test GETing from a slow http server."
-       (tmp_path / 'index.txt').write_text('Hello, poorconn!')
+   @pytest.mark.poorconn_http_server_config(t=2, length=1024)
+   def test_slow_http_server(poorconn_http_server, tmp_path):
+       "Test GETing from a slow local http server that delays 2 seconds to send every 1024 bytes."
+       (tmp_path / 'index.txt').write_bytes(b'h' * 1024)
        starting_time = time.time()
        content = requests.get(f'{poorconn_http_server.url}/index.txt').content
        ending_time = time.time()
-       assert ending_time - starting_time > 1
+       assert ending_time - starting_time > 2
 
 .. readme-misc
 
