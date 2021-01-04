@@ -42,7 +42,7 @@ Please open a ticket on the `GitLab Issue Tracker <https://gitlab.com/xuhdev/poo
 Contributing
 ------------
 
-Contributions are welcome! To get started, check out :doc:`CONTRIBUTING`.
+Contributions are welcome! To get started, check out ``CONTRIBUTING.rst``.
 
 Copyright and License
 ---------------------
