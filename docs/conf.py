@@ -31,7 +31,6 @@ extensions = [
     "pallets_sphinx_themes",
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
-    'sphinx.ext.ifconfig',
     'sphinx.ext.intersphinx',
 ]
 
