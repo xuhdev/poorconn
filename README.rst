@@ -12,7 +12,7 @@ Install this package via
 
    $ pip install 'poorconn[full]'  # or "pip install poorconn" if you don't need pytest support
 
-If you use :mod:`pytest`:
+If you use `pytest`_:
 
 .. code-block:: python
 
@@ -30,6 +30,8 @@ If you use :mod:`pytest`:
        ending_time = time.time()
        assert ending_time - starting_time > 1
 
+.. readme-misc
+
 Bug Reports and Feature Requests
 --------------------------------
 
@@ -40,20 +42,20 @@ Contributing
 
 Contributions are welcome! To get started, check out :doc:`CONTRIBUTING`.
 
-.. ifconfig:: False
+Copyright and License
+---------------------
 
-   Copyright and License
-   ---------------------
+Copyright (C) 2020--2021 Hong Xu <hong@topbug.net>
 
-   Copyright (C) 2020--2021 Hong Xu <hong@topbug.net>
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+later version.
 
-   This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
-   Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
-   later version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+details.
 
-   This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
-   details.
+You should have received a copy of the GNU Lesser General Public License along with this program. If not, see
+<https://www.gnu.org/licenses/>.
 
-   You should have received a copy of the GNU Lesser General Public License along with this program. If not, see
-   <https://www.gnu.org/licenses/>.
+.. _pytest: https://www.pytest.org
