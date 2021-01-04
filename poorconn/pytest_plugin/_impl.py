@@ -74,8 +74,13 @@ else:  # pragma: no cover
     _HTTPServer.allow_reuse_address = True
 
 
-_DEFAULT_PORT: int = 8080
-_LOCALHOST: str = 'localhost'
+class _PoorConnHTTPServerDefault:
+    "Default of options for :func:`poorconn_http_server`."
+
+    ADDRESS: str = 'localhost'
+    PORT: int = 8080
+    T: float = 1
+    LENGTH: int = 1024
 
 
 @pytest.fixture
@@ -95,12 +100,14 @@ def poorconn_http_server(tmp_path: pathlib.Path, request: pytest.FixtureRequest)
         options = config.kwargs
     else:
         options = {}
-    port = options.get('port', _DEFAULT_PORT)
-    address = options.get('address', _LOCALHOST)
+    port = options.get('port', _PoorConnHTTPServerDefault.PORT)
+    address = options.get('address', _PoorConnHTTPServerDefault.ADDRESS)
+    t = options.get('t', _PoorConnHTTPServerDefault.T)
+    length = options.get('length', _PoorConnHTTPServerDefault.LENGTH)
 
     with _HTTPServer((address, port), Handler) as httpd:
         httpd.socket = make_socket_patchable(httpd.socket)
-        delay_before_sending_upon_acceptance(httpd.socket, t=1, length=1024)
+        delay_before_sending_upon_acceptance(httpd.socket, t=t, length=length)
         # Type ignored due to https://github.com/python/typeshed/pull/4882
         # TODO: Remove this type ignore when a new mypy release is out
         thread = httpd.serve_forever_new_thread()  # type: ignore

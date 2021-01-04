@@ -219,7 +219,8 @@ class DelayBeforeSendingUponAcceptanceController:
 
 def delay_before_sending_upon_acceptance(s: socket, t: float,
                                          length: int = 1024) -> DelayBeforeSendingUponAcceptanceController:
-    """Delay ``t`` seconds before sending for all sockets returned by ``s.accept()``, for once (first time only).
+    """For every socket object returned by ``s.accept()``, Chop the content (``bytes`` in :meth:`socket.socket.send` and
+    :meth:`socket.socket.sendall`) to be sent in ``length`` bytes and delay ``t`` seconds before sending every time.
     Parameters mean the same as :func:`.delay_before_sending`.
 
     :return: A :class:`DelayBeforeSendingUponAcceptanceController` object that controls the patched socket object.
