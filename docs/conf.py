@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'poorconn'
-copyright = '2020, Hong Xu'
+copyright = '2020–2021, Hong Xu'
 author = 'Hong Xu'
 
 
@@ -31,6 +31,7 @@ extensions = [
     "pallets_sphinx_themes",
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
+    'sphinx.ext.ifconfig',
     'sphinx.ext.intersphinx',
 ]
 
@@ -53,6 +54,7 @@ intersphinx_mapping = {'pytest': ('https://docs.pytest.org/en/stable/', None),
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '.tox', 'tests', 'git']
 
+highlight_language = 'none'
 
 # -- Options for HTML output -------------------------------------------------
 

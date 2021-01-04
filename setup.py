@@ -21,8 +21,8 @@ import setuptools
 setuptools.setup(
     name="poorconn",
     description="Simulating poor network connections.",
-    long_description=pathlib.Path("README.md").read_text(),
-    long_description_content_type="text/markdown",
+    long_description=pathlib.Path("README.rst").read_text(),
+    long_description_content_type="text/x-rst",
     keywords="socket",
     author="Hong Xu",
     author_email="hong@topbug.net",
