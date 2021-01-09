@@ -22,7 +22,7 @@ flake8==3.8.4
     #   flake8-executable
 gitdb==4.0.5
     # via gitpython
-gitpython==3.1.11
+gitpython==3.1.12
     # via bandit
 importlib-metadata==3.3.0
     # via
