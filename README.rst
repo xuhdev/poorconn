@@ -12,7 +12,7 @@ Install this package via
 
    $ pip install 'poorconn[full]'  # or "pip install poorconn" if you don't need pytest support
 
-If you use `pytest`_:
+If you use `pytest`_, the following example gets you started with testing against a slow HTTP server:
 
 .. code-block:: python
 
@@ -28,9 +28,33 @@ If you use `pytest`_:
        "Test GETing from a slow local http server that delays 2 seconds to send every 1024 bytes."
        (tmp_path / 'index.txt').write_bytes(b'h' * 1024)
        starting_time = time.time()
+       # Replace the following line with the program you want to test
        content = requests.get(f'{poorconn_http_server.url}/index.txt').content
        ending_time = time.time()
        assert ending_time - starting_time > 2
+
+If you don't use `pytest`_ (or need advanced features that pytest fixtures do not provide), the following example starts
+a local HTTP server at port 8000 that always closes connections upon accepting them:
+
+.. code-block:: python
+
+   from http.server import HTTPServer, SimpleHTTPRequestHandler
+   from poorconn import close_upon_accepting, make_socket_patchable
+
+   # Start a local HTTP server that always closes connections upon established
+   with HTTPServer(("localhost", 8000), SimpleHTTPRequestHandler) as httpd:
+       httpd.socket = make_socket_patchable(httpd.socket)
+       close_upon_accepting(httpd.socket)
+       httpd.serve_forever()
+
+After running the code above, connections from a client would establish but fail to communicate subsequently:
+
+.. code-block:: console
+
+   $ wget -t 1 http://127.0.0.1:8000
+   Connecting to 127.0.0.1:8000... connected.
+   HTTP request sent, awaiting response... No data received.
+   Giving up.
 
 .. readme-bug
 
