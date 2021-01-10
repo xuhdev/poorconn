@@ -32,17 +32,22 @@ If you use `pytest`_:
        ending_time = time.time()
        assert ending_time - starting_time > 2
 
-.. readme-misc
+.. readme-bug
 
 Bug Reports and Feature Requests
 --------------------------------
 
 Please open a ticket on the `GitLab Issue Tracker <https://gitlab.com/xuhdev/poorconn/-/issues>`__.
 
+
+.. readme-contributing
+
 Contributing
 ------------
 
 Contributions are welcome! To get started, check out ``CONTRIBUTING.rst``.
+
+.. readme-copyright
 
 Copyright and License
 ---------------------
