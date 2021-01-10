@@ -1,6 +1,26 @@
 Poorconn: Simulating Unstable Network Conditions
 ================================================
 
+.. image:: https://img.shields.io/pypi/v/poorconn.svg
+   :target: https://pypi.python.org/pypi/poorconn
+   :alt: PyPI
+
+.. image:: https://img.shields.io/pypi/pyversions/poorconn.svg
+   :target: https://pypi.python.org/pypi/poorconn
+   :alt: PyPI - Python Versions
+
+.. image:: https://img.shields.io/pypi/implementation/poorconn
+   :target: https://pypi.python.org/pypi/poorconn
+   :alt: PyPI - Implementation
+
+.. image:: https://gitlab.com/xuhdev/poorconn/badges/master/pipeline.svg
+   :target: https://gitlab.com/xuhdev/poorconn/-/commits/master
+   :alt: Pipeline Status
+
+.. image:: https://gitlab.com/xuhdev/poorconn/badges/master/coverage.svg
+   :target: https://gitlab.com/xuhdev/poorconn/-/commits/master
+   :alt: Coverage
+
 Poorconn simulates unstable network conditions. It is suitable for testing purposes.
 
 Quickstart
