@@ -1,5 +1,8 @@
+.. currentmodule:: poorconn
+
 .. include:: ../README.rst
-   :end-before: readme-roles
+   :start-after: readme-main
+   :end-before: readme-misc
 
 Documentation
 -------------

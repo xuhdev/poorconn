@@ -1,5 +1,12 @@
-Poorconn: Simulating Unstable Network Conditions
-================================================
+.. readme-roles
+
+.. role:: doc(literal)
+.. role:: func(literal)
+
+.. readme-main
+
+Poorconn: Simulating Poor Network Conditions
+============================================
 
 .. image:: https://img.shields.io/pypi/v/poorconn.svg
    :target: https://pypi.python.org/pypi/poorconn
@@ -21,7 +28,16 @@ Poorconn: Simulating Unstable Network Conditions
    :target: https://gitlab.com/xuhdev/poorconn/-/commits/master
    :alt: Coverage
 
-Poorconn simulates unstable network conditions. It is suitable for testing purposes.
+
+Poorconn is a Python package that simulates poor network conditions. It is suitable for testing purposes, for both
+Python and non-Python projects.
+
+It can simulate the following unstable network conditions:
+
+- Throttled network connections. (:func:`delay_before_sending`, :func:`delay_before_sending_upon_acceptance`)
+- Servers that cut off connections immediately upon accepting them. (:func:`close_upon_accepting`)
+- Connections that are initially slow, but become normal subsequently. (:func:`delay_before_sending_once`,
+  :func:`delay_before_sending_upon_acceptance_once`)
 
 Quickstart
 ----------
@@ -75,10 +91,6 @@ After running the code above, connections from a client would establish but fail
    Connecting to 127.0.0.1:8000... connected.
    HTTP request sent, awaiting response... No data received.
    Giving up.
-
-.. readme-roles
-
-.. role:: doc(literal)
 
 .. readme-misc
 
