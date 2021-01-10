@@ -1,5 +1,5 @@
 .. include:: ../README.rst
-   :end-before: readme-bug
+   :end-before: readme-roles
 
 Documentation
 -------------
@@ -12,16 +12,7 @@ Documentation
   license
 
 .. include:: ../README.rst
-   :start-after: readme-bug
-   :end-before: readme-contributing
-
-Contributing
-------------
-
-Contributions are welcome! To get started, check out :doc:`CONTRIBUTING`.
-
-.. include:: ../README.rst
-   :start-after: readme-copyright
+   :start-after: readme-misc
 
 Indices and Tables
 ------------------

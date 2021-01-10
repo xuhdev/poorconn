@@ -56,22 +56,21 @@ After running the code above, connections from a client would establish but fail
    HTTP request sent, awaiting response... No data received.
    Giving up.
 
-.. readme-bug
+.. readme-roles
+
+.. role:: doc(literal)
+
+.. readme-misc
 
 Bug Reports and Feature Requests
 --------------------------------
 
 Please open a ticket on the `GitLab Issue Tracker <https://gitlab.com/xuhdev/poorconn/-/issues>`__.
 
-
-.. readme-contributing
-
 Contributing
 ------------
 
-Contributions are welcome! To get started, check out ``CONTRIBUTING.rst``.
-
-.. readme-copyright
+Contributions are welcome! To get started, check out :doc:`CONTRIBUTING`.
 
 Copyright and License
 ---------------------
