@@ -20,6 +20,14 @@ Poorconn: Simulating Poor Network Conditions
    :target: https://pypi.python.org/pypi/poorconn
    :alt: PyPI - Implementation
 
+.. image:: https://img.shields.io/badge/-Documentation-informational
+   :target: https://poorconn.topbug.net
+   :alt: Documentation
+
+.. image:: https://img.shields.io/pypi/l/poorconn
+   :target: https://gitlab.com/xuhdev/poorconn/-/blob/master/COPYING
+   :alt: PyPI - License
+
 .. image:: https://gitlab.com/xuhdev/poorconn/badges/master/pipeline.svg
    :target: https://gitlab.com/xuhdev/poorconn/-/commits/master
    :alt: Pipeline Status
@@ -27,7 +35,6 @@ Poorconn: Simulating Poor Network Conditions
 .. image:: https://gitlab.com/xuhdev/poorconn/badges/master/coverage.svg
    :target: https://gitlab.com/xuhdev/poorconn/-/commits/master
    :alt: Coverage
-
 
 Poorconn is a Python package that simulates poor network conditions. It is suitable for testing purposes, for both
 Python and non-Python projects.
