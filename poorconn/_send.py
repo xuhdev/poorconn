@@ -64,6 +64,10 @@ class DelayBeforeSendingOnceController:
 def delay_before_sending_once(s: socket, t: float) -> DelayBeforeSendingOnceController:
     """Delay ``t`` seconds before sending for once (first time only).
 
+    This function achieves the results by patching ``s``'s member methods :meth:`~socket.socket.send` and
+    :meth:`~socket.socket.sendall`. ``s``'s :meth:`~socket.socket.sendfile` method is not patched due to its
+    inconsistent behavior across operating systems.
+
     :param s: The :class:`socket.socket` object whose sending methods are to be delayed for once and once only.
     :param t: Number of seconds to delay.
 
@@ -107,6 +111,10 @@ class DelayBeforeSendingController:
 def delay_before_sending(s: socket, t: float, length: int = 1024) -> DelayBeforeSendingController:
     """Chop the content (``bytes`` in :meth:`socket.socket.send` and :meth:`socket.socket.sendall`) to be sent in
     ``length`` bytes and delay ``t`` seconds before sending every time.
+
+    This function achieves the results by patching ``s``'s member methods :meth:`~socket.socket.send` and
+    :meth:`~socket.socket.sendall`. ``s``'s :meth:`~socket.socket.sendfile` method is not patched due to its
+    inconsistent behavior across operating systems.
 
     :param s: The :class:`socket.socket` object whose sending methods are to be delayed every time.
     :param t: Number of seconds to delay.
@@ -186,6 +194,10 @@ def delay_before_sending_upon_acceptance_once(s: socket, t: float) -> DelayBefor
     """Delay ``t`` seconds before sending for all sockets returned by ``s.accept()``, for once (first time only).
     Parameters mean the same as :func:`.delay_before_sending_once`.
 
+    This function achieves the results by patching the connection sockets' member methods :meth:`~socket.socket.send`
+    and :meth:`~socket.socket.sendall`. Their :meth:`~socket.socket.sendfile` methods are not patched due to their
+    inconsistent behavior across operating systems.
+
     :return: A :class:`DelayBeforeSendingUponAcceptanceOnceController` object that controls the patched socket object.
     """
 
@@ -222,6 +234,10 @@ def delay_before_sending_upon_acceptance(s: socket, t: float,
     """For every socket object returned by ``s.accept()``, Chop the content (``bytes`` in :meth:`socket.socket.send` and
     :meth:`socket.socket.sendall`) to be sent in ``length`` bytes and delay ``t`` seconds before sending every time.
     Parameters mean the same as :func:`.delay_before_sending`.
+
+    This function achieves the results by patching the connection sockets' member methods :meth:`~socket.socket.send`
+    and :meth:`~socket.socket.sendall`. Their :meth:`~socket.socket.sendfile` methods are not patched due to their
+    inconsistent behavior across operating systems.
 
     :return: A :class:`DelayBeforeSendingUponAcceptanceController` object that controls the patched socket object.
     """
