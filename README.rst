@@ -40,7 +40,7 @@ Poorconn: Simulating Poor Network Conditions
 Poorconn is a Python package that simulates poor network conditions. It is suitable for testing purposes, for both
 Python and non-Python projects.
 
-It can simulate the following unstable network conditions:
+It is capable of simulating the following poor network conditions:
 
 - Throttled network connections. (:func:`delay_before_sending`, :func:`delay_before_sending_upon_acceptance`)
 - Servers that cut off connections immediately upon accepting them. (:func:`close_upon_accepting`)

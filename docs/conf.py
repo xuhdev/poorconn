@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#
 # Configuration file for the Sphinx documentation builder.
 #
 # This file only contains a selection of the most common options. For a full
@@ -65,6 +67,7 @@ highlight_language = 'none'
 # a list of builtin themes.
 #
 html_theme = 'furo'
+html_title = 'poorconn'
 templates_path = ['_templates']
 html_static_path = ['_static']
 html_css_files = ['css/custom.css']
