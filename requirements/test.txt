@@ -14,7 +14,7 @@ coverage==5.3.1
     # via -r test.in
 idna==2.10
     # via requests
-importlib-metadata==3.3.0
+importlib-metadata==3.4.0
     # via
     #   pluggy
     #   pytest

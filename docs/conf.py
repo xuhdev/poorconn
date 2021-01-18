@@ -33,7 +33,6 @@ rst_epilog = """
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "pallets_sphinx_themes",
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
@@ -65,7 +64,7 @@ highlight_language = 'none'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'pocoo'
+html_theme = 'furo'
 templates_path = ['_templates']
 html_static_path = ['_static']
 html_css_files = ['css/custom.css']

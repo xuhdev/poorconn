@@ -8,29 +8,27 @@ alabaster==0.7.12
     # via sphinx
 babel==2.9.0
     # via sphinx
+beautifulsoup4==4.9.3
+    # via furo
 certifi==2020.12.5
     # via requests
 chardet==4.0.0
     # via requests
 docutils==0.16
     # via sphinx
+furo==2020.12.30b24
+    # via -r docs.in
 idna==2.10
     # via requests
 imagesize==1.2.0
     # via sphinx
-importlib-metadata==3.3.0
-    # via pallets-sphinx-themes
 jinja2==2.11.2
     # via sphinx
 markupsafe==1.1.1
     # via jinja2
 packaging==20.8
-    # via
-    #   pallets-sphinx-themes
-    #   sphinx
-pallets-sphinx-themes==1.2.3
-    # via -r docs.in
-pygments==2.7.3
+    # via sphinx
+pygments==2.7.4
     # via sphinx
 pyparsing==2.4.7
     # via packaging
@@ -40,10 +38,12 @@ requests==2.25.1
     # via sphinx
 snowballstemmer==2.0.0
     # via sphinx
+soupsieve==2.1
+    # via beautifulsoup4
 sphinx==3.4.3
     # via
     #   -r docs.in
-    #   pallets-sphinx-themes
+    #   furo
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
@@ -56,12 +56,8 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.4
     # via sphinx
-typing-extensions==3.7.4.3
-    # via importlib-metadata
 urllib3==1.26.2
     # via requests
-zipp==3.4.0
-    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
