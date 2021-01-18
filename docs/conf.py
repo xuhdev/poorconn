@@ -26,6 +26,7 @@ author = 'Hong Xu'
 
 rst_epilog = """
 .. _pytest: https://www.pytest.org
+.. _CPython: https://github.com/python/cpython
 """
 
 # Add any Sphinx extension module names here, as strings. They can be
