@@ -10,6 +10,7 @@ Documentation
 .. toctree::
   :maxdepth: 1
 
+  tutorial
   apis
   CONTRIBUTING
   license

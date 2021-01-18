@@ -46,6 +46,9 @@ It can simulate the following unstable network conditions:
 - Connections that are initially slow, but become normal subsequently. (:func:`delay_before_sending_once`,
   :func:`delay_before_sending_upon_acceptance_once`)
 
+
+.. _quickstart:
+
 Quickstart
 ----------
 
