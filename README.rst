@@ -2,6 +2,7 @@
 
 .. role:: doc(literal)
 .. role:: func(literal)
+.. role:: mod(literal)
 
 .. readme-main
 
@@ -58,29 +59,7 @@ Install this package via
 
    $ pip install 'poorconn[full]'  # or "pip install poorconn" if you don't need pytest support
 
-If you use `pytest`_, the following example gets you started with testing against a slow HTTP server:
-
-.. code-block:: python
-
-   pytest_plugins = ('poorconn',)
-
-   from pathlib import Path
-   import time
-   import requests
-   import pytest
-
-   @pytest.mark.poorconn_http_server_config(t=2, length=1024)
-   def test_slow_http_server(poorconn_http_server, tmp_path):
-       "Test GETing from a slow local http server that delays 2 seconds to send every 1024 bytes."
-       (tmp_path / 'index.txt').write_bytes(b'h' * 1024)
-       starting_time = time.time()
-       # Replace the following line with the program you want to test
-       content = requests.get(f'{poorconn_http_server.url}/index.txt').content
-       ending_time = time.time()
-       assert ending_time - starting_time > 2
-
-If you don't use `pytest`_ (or need advanced features that pytest fixtures do not provide), the following example starts
-a local HTTP server at port 8000 that always closes connections upon accepting them:
+The following example starts a local HTTP server at port 8000 that always closes connections upon accepting them:
 
 .. code-block:: python
 
@@ -101,6 +80,28 @@ After running the code above, connections from a client would establish but fail
    Connecting to 127.0.0.1:8000... connected.
    HTTP request sent, awaiting response... No data received.
    Giving up.
+
+If you use `pytest`_, you can also take advantage of poorconn fixtures in :mod:`poorconn.pytest_plugin`. The following
+example gets you started with testing against a slow HTTP server:
+
+.. code-block:: python
+
+   pytest_plugins = ('poorconn',)
+
+   from pathlib import Path
+   import time
+   import requests
+   import pytest
+
+   @pytest.mark.poorconn_http_server_config(t=2, length=1024)
+   def test_slow_http_server(poorconn_http_server, tmp_path):
+       "Test GETing from a slow local http server that delays 2 seconds to send every 1024 bytes."
+       (tmp_path / 'index.txt').write_bytes(b'h' * 1024)
+       starting_time = time.time()
+       # Replace the following line with the program you want to test
+       content = requests.get(f'{poorconn_http_server.url}/index.txt').content
+       ending_time = time.time()
+       assert ending_time - starting_time > 2
 
 .. readme-misc
 

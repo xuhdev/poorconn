@@ -1,8 +1,6 @@
-import certifi
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from poorconn import close_upon_accepting, make_socket_patchable
 from ssl import PROTOCOL_TLS_SERVER, SSLContext
-
 
 with HTTPServer(("localhost", 8888), SimpleHTTPRequestHandler) as httpd:
     context = SSLContext(PROTOCOL_TLS_SERVER)

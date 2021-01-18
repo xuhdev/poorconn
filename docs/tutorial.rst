@@ -3,8 +3,8 @@ Tutorial
 
 .. currentmodule:: poorconn
 
-Poorconn is a Python package that simulates poor network conditions. If you have not done so, it is recommended to read
-:ref:`quickstart` first to have an overall feel about poorconn usage.
+Poorconn is a Python package that simulates poor network conditions. To have an overall feel about poorconn usage, it is
+recommended to read :ref:`quickstart` first if you have not done so.
 
 Poorconn consists of two parts:
 
@@ -17,11 +17,11 @@ The Main Package :mod:`poorconn`
 Basic Usage
 ~~~~~~~~~~~
 
-The main package :mod:`poorconn` includes a list of simulation functions that modify a :class:`~socket.socket` object so
-that it behaves poorly as if it were under poor network conditions. To use one of these simulation functions, always
-ensure that the :class:`~socket.socket` object is patchable (so that it can be modified, will be explained in
-:ref:`how-does-it-work` below) by calling :func:`make_socket_patchable` first, then call the simulation function that
-you would like to use.
+The main package :mod:`poorconn` includes a list of simulation functions, each of which modifies a
+:class:`~socket.socket` object so that it behaves poorly as if it were under some kind of poor network conditions. To
+use one of these simulation functions, always ensure that the :class:`~socket.socket` object is patchable (so that it
+can be modified, which will be explained in :ref:`how-does-it-work`) by calling :func:`make_socket_patchable` first,
+then call the simulation function that you would like to use.
 
 For example, consider :func:`delay_before_sending`, a simulation function that delays a :class:`~socket.socket` object
 every time when it tries to send a message. The following code snippet achieves this effect on the
@@ -38,10 +38,9 @@ every time when it tries to send a message. The following code snippet achieves 
    delay_before_sending(s, 2, 1024)
 
 The code snippet above turns ``s`` to delay 2 seconds for sending every 1024 bytes of messages. Line 5 calls
-:func:`make_socket_patchable` so that ``s`` becomes patchable (so that it can be modified, will be explained in
-:ref:`how-does-it-work` below). Line 6 calls :func:`delay_before_sending` so that ``s``'s sending methods are patched so
-that extra code that delays the sending is in place. As the example in :ref:`quickstart` shows, simulation functions can
-also be applied to socket objects that are used in HTTP server objects.
+:func:`make_socket_patchable` so that ``s`` becomes patchable. Line 6 calls :func:`delay_before_sending` so that ``s``'s
+sending methods are patched so that extra code that delays the sending is in place. As the example in :ref:`quickstart`
+shows, simulation functions can also be applied to socket objects that are used in HTTP server objects.
 
 .. _how-does-it-work:
 
@@ -69,8 +68,8 @@ However, not every :class:`~socket.socket` object can be patched by default. For
    AttributeError: 'socket' object attribute 'send' is read-only
 
 This is why we provide :func:`make_socket_patchable`. This function first detects whether pertinent methods (such as
-:meth:`~socket.socket.send`) of an object are patchable. If yes, it does nothing and returns the object. If not, it
-would detach the underlying C socket object and attach it to a newly created :class:`PatchableSocket` object. A
+:meth:`~socket.socket.send`) of an object are patchable. If yes, it does nothing and returns the object itself. If not,
+it would detach the underlying C socket object and attach it to a newly created :class:`PatchableSocket` object. A
 :class:`PatchableSocket` object is almost the same as a :class:`socket.socket` object, except that all pertinent methods
 are made patchable. Therefore, it is recommended to always call :func:`make_socket_patchable` before calling any
 simulation functions.
@@ -81,13 +80,17 @@ Advanced Usage
 Stacking Simulation Functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Thanks to the mechanism in :ref:`how-does-it-work`, it is possible to stack simulation functions with other functions.
-For example, to create an HTTPS server that always accepts incoming connections but immediately closes the connection,
-simply apply a simulation function after applying an SSL wrapper:
+Thanks to the mechanism in :ref:`how-does-it-work`, it is possible to stack simulation functions with other functions
+that modify :class:`~socket.socket` objects. For example, an SSL wrapper (:meth:`ssl.SSLContext.wrap_socket`) is usually
+used to create an HTTPS server. :func:`poorconn.close_upon_accepting` makes a listening socket object close the
+connection immediately after accepting this connection. Stacking :meth:`~ssl.SSLContext.wrap_socket` and
+:func:`close_upon_accepting` combines these two effects---It can be used to create an HTTPS server that always accepts
+incoming connections but immediately closes the connections afterwards:
 
 .. literalinclude:: ./examples/https.py
    :caption: https.py
    :language: python
+   :emphasize-lines: 9-11
    :linenos:
 
 (Download :download:`https.py <./examples/https.py>`)

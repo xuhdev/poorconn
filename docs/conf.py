@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'poorconn'
-copyright = '2020–2021, Hong Xu'
+copyright = '2020–2021, Hong Xu <hong@topbug.net>'
 author = 'Hong Xu'
 
 
