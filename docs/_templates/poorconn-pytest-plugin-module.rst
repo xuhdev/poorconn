@@ -16,14 +16,14 @@
 
    {% block functions %}
    {% if functions %}
-   .. rubric:: {{ _('Simulation Functions') }}
-
-   .. rubric:: {{ _('Other Functions') }}
+   .. rubric:: {{ _('Functions') }}
 
    .. autosummary::
       :toctree:
    {% for item in functions %}
+      {% if item != 'pytest_configure' %}
       {{ item }}
+      {% endif %}
    {%- endfor %}
    {% endif %}
    {% endblock %}

@@ -1,21 +1,12 @@
-Tutorial
-========
-
 .. currentmodule:: poorconn
 
-Poorconn is a Python package that simulates poor network conditions. To have an overall feel about poorconn usage, it is
-recommended to read :ref:`quickstart` first if you have not done so.
-
-Poorconn consists of two parts:
-
-- The main package :mod:`poorconn` that provides generically useful functions that can be used in any Python code, and
-- the subpackage :mod:`poorconn.pytest_plugin` that provides useful `pytest`_ utilities.
-
 The Main Package :mod:`poorconn`
---------------------------------
+================================
+
+The main package provides generically useful functions that can be used in any Python code.
 
 Basic Usage
-~~~~~~~~~~~
+-----------
 
 The main package :mod:`poorconn` includes a list of simulation functions, each of which modifies a
 :class:`~socket.socket` object so that it behaves poorly as if it were under some kind of poor network conditions. To
@@ -45,7 +36,7 @@ shows, simulation functions can also be applied to socket objects that are used 
 .. _how-does-it-work:
 
 How Does It Work?
-~~~~~~~~~~~~~~~~~
+-----------------
 
 The main package simulates poor network conditions by `monkey patching
 <https://stackoverflow.com/questions/5626193/what-is-monkey-patching>`__ ("patching" for short) methods in
@@ -75,10 +66,10 @@ are made patchable. Therefore, it is recommended to always call :func:`make_sock
 simulation functions.
 
 Advanced Usage
-~~~~~~~~~~~~~~
+--------------
 
 Stacking Simulation Functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Thanks to the mechanism in :ref:`how-does-it-work`, it is possible to stack simulation functions with other functions
 that modify :class:`~socket.socket` objects. For example, an SSL wrapper (:meth:`ssl.SSLContext.wrap_socket`) is usually
@@ -87,13 +78,13 @@ connection immediately after accepting this connection. Stacking :meth:`~ssl.SSL
 :func:`close_upon_accepting` combines these two effects---It can be used to create an HTTPS server that always accepts
 incoming connections but immediately closes the connections afterwards:
 
-.. literalinclude:: ./examples/https.py
+.. literalinclude:: ../examples/https.py
    :caption: https.py
    :language: python
    :emphasize-lines: 9-11
    :linenos:
 
-(Download :download:`https.py <./examples/https.py>`)
+(Download :download:`https.py <../examples/https.py>`)
 
 After running this script, connections from a client would establish but fail to communicate subsequently:
 

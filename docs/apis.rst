@@ -9,6 +9,6 @@ API References
 
 .. autosummary::
    :toctree: apis
-   :template: our-module.rst
+   :template: poorconn-pytest-plugin-module.rst
 
    poorconn.pytest_plugin

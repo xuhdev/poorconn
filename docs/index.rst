@@ -10,7 +10,7 @@ Documentation
 .. toctree::
   :maxdepth: 1
 
-  tutorial
+  tutorial/index
   apis
   CONTRIBUTING
   license

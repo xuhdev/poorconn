@@ -33,7 +33,7 @@ from poorconn import delay_before_sending_upon_acceptance, make_socket_patchable
 def pytest_configure(config) -> None:
     # register markers
     config.addinivalue_line(
-        "markers", "poorconn_http_server_config(address, port): Configure fixture ``poorconn_http_server``."
+        "markers", "poorconn_http_server_config(address, port, t, length): Configure fixture ``poorconn_http_server``."
     )
 
 
@@ -85,9 +85,25 @@ class _PoorConnHTTPServerDefault:
 
 @pytest.fixture
 def poorconn_http_server(tmp_path: pathlib.Path, request: pytest.FixtureRequest) -> Iterator[Server]:
-    """A simple session-wide HTTPServer object on a new thread. By default, it listens on ``localhost``, and tries ports
-    from 8080 incrementally until a port that it can use. It's socket is slowed down with
-    :func:`poorconn.delay_before_sending`. It serves :func:`tmp_path` as the root directory.
+    """A :mod:`pytest` fixture: An :class:`http.server.HTTPServer` object that serves on a new thread. By default, it
+    listens on ``localhost:8080``. It's socket is slowed down with :func:`poorconn.delay_before_sending`. It serves
+    ``tmp_path`` as the root directory.
+
+    The defaults can be modified by applying the ``@pytest.mark.poorconn_http_server_config`` marker. The marker accepts
+    the following parameters:
+
+    - ``address``: The address to bind the HTTP server.
+    - ``port``: The port that the HTTP server listens on.
+    - ``t``: Same as ``t`` in :func:`poorconn.delay_before_sending`.
+    - ``length``: Same as ``length`` in :func:`poorconn.delay_before_sending`.
+
+    Example:
+
+    .. code-block:: python
+
+       @pytest.mark.poorconn_http_server_config(address='127.0.0.1', port=2222, t=2, length=1024)
+       def test_http_server(poorconn_http_server, tmp_path):
+           "My test..."
     """
     class Handler(SimpleHTTPRequestHandler):
         def __init__(self, *args: Any, directory: pathlib.Path = tmp_path, **kwargs: Any):
