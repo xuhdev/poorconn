@@ -1,13 +1,5 @@
 {{ fullname | escape | underline}}
 
-{% set simulation_functions =
-      'close_upon_accepting',
-      'delay_before_sending',
-      'delay_before_sending_once',
-      'delay_before_sending_upon_acceptance',
-      'delay_before_sending_upon_acceptance_once'
-%}
-
 .. automodule:: {{ fullname }}
 
    {% block attributes %}
@@ -26,20 +18,12 @@
    {% if functions %}
    .. rubric:: {{ _('Simulation Functions') }}
 
-   .. autosummary::
-      :toctree:
-   {% for item in simulation_functions %}
-      {{ item }}
-   {%- endfor %}
-
    .. rubric:: {{ _('Other Functions') }}
 
    .. autosummary::
       :toctree:
    {% for item in functions %}
-     {% if item not in simulation_functions %}
       {{ item }}
-     {% endif %}
    {%- endfor %}
    {% endif %}
    {% endblock %}
