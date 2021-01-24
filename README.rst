@@ -81,6 +81,31 @@ After running the code above, connections from a client would establish but fail
    HTTP request sent, awaiting response... No data received.
    Giving up.
 
+For another example, to start a local HTTP server that always throttle connections upon accepting them, simply replace
+``close_upon_accepting(s)`` above with ``delay_before_sending_upon_acceptance(s, t=1, length=1024)`` and adjust imports
+(here, :func:`poorconn.delay_before_sending_upon_acceptance` delays roughly 1 seconds for every 1024 bytes sent):
+
+.. code-block:: console
+   :emphasize-lines: 7
+
+   $ wget http://127.0.0.1:8000
+   Connecting to 127.0.0.1:8000... connected.
+   HTTP request sent, awaiting response... 200 OK
+   Length: 1609 (1.6K) [text/html]
+   Saving to: 'index.html'
+
+   index.html    1.57K   804 B/s    in 2.0s
+
+   'index.html' saved [1609/1609]
+
+(Output above is abridged.)
+
+See the `poorconn module API references <https://poorconn.topbug.net/apis/poorconn.html>`__ for a list of such
+simulation functions.
+
+Integration with Pytest
+~~~~~~~~~~~~~~~~~~~~~~~
+
 If you use `pytest`_, you can also take advantage of poorconn fixtures in :mod:`poorconn.pytest_plugin`. The following
 example gets you started with testing against a slow HTTP server:
 
