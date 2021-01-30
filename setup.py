@@ -39,7 +39,6 @@ setuptools.setup(
         'full': ['pytest >= 6.2'],
     },
     classifiers=[
-        "Development Status :: 4 - Beta",
         "Framework :: Pytest",
         "Intended Audience :: Developers",
         "License :: DFSG approved",
