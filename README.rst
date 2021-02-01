@@ -86,7 +86,6 @@ For another example, to start a local HTTP server that always throttle connectio
 (here, :func:`poorconn.delay_before_sending_upon_acceptance` delays roughly 1 seconds for every 1024 bytes sent):
 
 .. code-block:: console
-   :emphasize-lines: 7
 
    $ wget http://127.0.0.1:8000
    Connecting to 127.0.0.1:8000... connected.
@@ -94,7 +93,7 @@ For another example, to start a local HTTP server that always throttle connectio
    Length: 1609 (1.6K) [text/html]
    Saving to: 'index.html'
 
-   index.html    1.57K   804 B/s    in 2.0s
+   index.html    1.57K   804 B/s    in 2.0s  <====== NOTE the time
 
    'index.html' saved [1609/1609]
 
