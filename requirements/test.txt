@@ -10,7 +10,7 @@ certifi==2020.12.5
     # via requests
 chardet==4.0.0
     # via requests
-coverage==5.3.1
+coverage==5.4
     # via -r test.in
 idna==2.10
     # via requests
@@ -20,7 +20,7 @@ importlib-metadata==3.4.0
     #   pytest
 iniconfig==1.1.1
     # via pytest
-packaging==20.8
+packaging==20.9
     # via
     #   -r test.in
     #   pytest
@@ -30,7 +30,7 @@ py==1.10.0
     # via pytest
 pyparsing==2.4.7
     # via packaging
-pytest==6.2.1
+pytest==6.2.2
     # via -r test.in
 requests==2.25.1
     # via -r test.in
@@ -38,7 +38,7 @@ toml==0.10.2
     # via pytest
 typing-extensions==3.7.4.3
     # via importlib-metadata
-urllib3==1.26.2
+urllib3==1.26.3
     # via requests
 zipp==3.4.0
     # via importlib-metadata
