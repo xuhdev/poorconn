@@ -1,7 +1,7 @@
 {{ fullname | escape | underline}}
 
 {% set simulation_functions =
-      'close_upon_accepting',
+      'close_upon_acceptance',
       'delay_before_sending',
       'delay_before_sending_once',
       'delay_before_sending_upon_acceptance',

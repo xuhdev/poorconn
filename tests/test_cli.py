@@ -34,7 +34,7 @@ def test_help(capsys, help_op):
     assert e.value.code == 0
     out, err = capsys.readouterr()
     assert 'Simulation commands' in out
-    assert 'close_upon_accepting' in out
+    assert 'close_upon_acceptance' in out
     assert len(err) == 0
 
     # A little sanity test to make sure the program run from the actual command line

@@ -43,7 +43,7 @@ Python and non-Python projects.
 It is capable of simulating the following poor network conditions:
 
 - Throttled network connections. (:func:`delay_before_sending`, :func:`delay_before_sending_upon_acceptance`)
-- Servers that cut off connections immediately upon accepting them. (:func:`close_upon_accepting`)
+- Servers that cut off connections immediately upon accepting them. (:func:`close_upon_acceptance`)
 - Connections that are initially slow, but become normal subsequently. (:func:`delay_before_sending_once`,
   :func:`delay_before_sending_upon_acceptance_once`)
 
@@ -64,12 +64,12 @@ The following example starts a local HTTP server at port 8000 that always closes
 .. code-block:: python
 
    from http.server import HTTPServer, SimpleHTTPRequestHandler
-   from poorconn import close_upon_accepting, make_socket_patchable
+   from poorconn import close_upon_acceptance, make_socket_patchable
 
    # Start a local HTTP server that always closes connections upon established
    with HTTPServer(("localhost", 8000), SimpleHTTPRequestHandler) as httpd:
        httpd.socket = make_socket_patchable(httpd.socket)
-       close_upon_accepting(httpd.socket)
+       close_upon_acceptance(httpd.socket)
        httpd.serve_forever()
 
 After running the code above, connections from a client would establish but fail to communicate subsequently:
@@ -82,7 +82,7 @@ After running the code above, connections from a client would establish but fail
    Giving up.
 
 For another example, to start a local HTTP server that always throttle connections upon accepting them, simply replace
-``close_upon_accepting(s)`` above with ``delay_before_sending_upon_acceptance(s, t=1, length=1024)`` and adjust imports
+``close_upon_acceptance(s)`` above with ``delay_before_sending_upon_acceptance(s, t=1, length=1024)`` and adjust imports
 (here, :func:`poorconn.delay_before_sending_upon_acceptance` delays roughly 1 seconds for every 1024 bytes sent):
 
 .. code-block:: console

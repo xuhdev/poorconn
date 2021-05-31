@@ -18,19 +18,19 @@ from socket import socket
 import pytest
 import requests
 
-from poorconn import close_upon_accepting, PatchableSocket
+from poorconn import close_upon_acceptance, PatchableSocket
 
 import utils
 
 
-def test_close_upon_accepting(timeout):
-    "Test :func:`poorconn.close_upon_accepting` with ``HTTPServer``."
+def test_close_upon_acceptance(timeout):
+    "Test :func:`poorconn.close_upon_acceptance` with ``HTTPServer``."
 
     with PatchableSocket() as server_sock:
         utils.set_server_socket_options(server_sock)
         server_sock.bind(('localhost', 7999))
         id_accept = id(server_sock.accept)
-        close_upon_accepting(server_sock)
+        close_upon_acceptance(server_sock)
         assert id_accept != id(server_sock.accept)  # Ensure that the socket object is wrapped
         server_sock.listen()
         with utils.echo_server_socket_new_thread(server_sock):
@@ -40,12 +40,12 @@ def test_close_upon_accepting(timeout):
                 assert len(client_sock.recv(128)) == 0
 
 
-def test_close_upon_accepting_http_server(http_server, http_url, timeout):
-    "Test :func:`poorconn.close_upon_accepting` with ``HTTPServer``."
+def test_close_upon_acceptance_http_server(http_server, http_url, timeout):
+    "Test :func:`poorconn.close_upon_acceptance` with ``HTTPServer``."
 
     patchable_sock = PatchableSocket.create_from(http_server.socket)
     id_accept = id(patchable_sock.accept)
-    close_upon_accepting(patchable_sock)
+    close_upon_acceptance(patchable_sock)
     assert id_accept != id(patchable_sock.accept)  # Ensure that the socket object is wrapped
     http_server.socket = patchable_sock
     utils.httpd_serve_new_thread(http_server)

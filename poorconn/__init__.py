@@ -15,7 +15,7 @@
 
 "The main package of Poorconn. It contains functions that simulate Poor Network Conditions."
 
-from ._accept import close_upon_accepting
+from ._accept import close_upon_acceptance
 from ._send import (DelayBeforeSendingController,
                     DelayBeforeSendingOnceController,
                     DelayBeforeSendingUponAcceptanceController,

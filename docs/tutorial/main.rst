@@ -73,9 +73,9 @@ Stacking Simulation Functions
 
 Thanks to the mechanism in :ref:`how-does-it-work`, it is possible to stack simulation functions with other functions
 that modify :class:`~socket.socket` objects. For example, an SSL wrapper (:meth:`ssl.SSLContext.wrap_socket`) is usually
-used to create an HTTPS server. :func:`poorconn.close_upon_accepting` makes a listening socket object close the
+used to create an HTTPS server. :func:`poorconn.close_upon_acceptance` makes a listening socket object close the
 connection immediately after accepting this connection. Stacking :meth:`~ssl.SSLContext.wrap_socket` and
-:func:`close_upon_accepting` combines these two effects---It can be used to create an HTTPS server that always accepts
+:func:`close_upon_acceptance` combines these two effects---It can be used to create an HTTPS server that always accepts
 incoming connections but immediately closes the connections afterwards:
 
 .. literalinclude:: ../examples/https.py

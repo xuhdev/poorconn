@@ -31,7 +31,7 @@ SimulationCommand = NamedTuple('SimulationCommand', [('name', str),
                                                      ('params', Dict[str, Callable])])
 
 simulation_commands: List[SimulationCommand] = [
-    SimulationCommand('close_upon_accepting', {}),
+    SimulationCommand('close_upon_acceptance', {}),
     SimulationCommand('delay_before_sending', {'t': float, 'length': int}),
     SimulationCommand('delay_before_sending_once', {'t': float}),
     SimulationCommand('delay_before_sending_upon_acceptance', {'t': float, 'length': int}),
