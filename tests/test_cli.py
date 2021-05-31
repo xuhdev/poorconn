@@ -42,6 +42,7 @@ def test_empty(capsys):
     out, err = capsys.readouterr()
     assert 'Simulation commands' in err
     assert 'close_upon_acceptance' in err
+    assert 'Example' in err
     assert len(out) == 0
 
     # A little sanity test to make sure the program work from the actual command line interface
@@ -49,6 +50,7 @@ def test_empty(capsys):
     assert cmd.returncode == 1
     assert 'Simulation commands' in cmd.stderr
     assert 'close_upon_acceptance' in cmd.stderr
+    assert 'Example' in cmd.stderr
     assert len(cmd.stdout) == 0
 
 
@@ -63,6 +65,7 @@ def test_help(capsys, help_op):
     out, err = capsys.readouterr()
     assert 'Simulation commands' in out
     assert 'close_upon_acceptance' in out
+    assert 'Example' in out
     assert len(err) == 0
 
     # A little sanity test to make sure the program work from the actual command line interface
@@ -70,6 +73,7 @@ def test_help(capsys, help_op):
     assert cmd.returncode == 0
     assert 'Simulation commands' in cmd.stdout
     assert 'close_upon_acceptance' in cmd.stdout
+    assert 'Example' in cmd.stdout
     assert len(cmd.stderr) == 0
 
 

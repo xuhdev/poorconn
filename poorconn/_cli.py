@@ -16,16 +16,23 @@
 "The command line interface of Poorconn."
 
 
-from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, RawDescriptionHelpFormatter
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import shlex
 import sys
+import textwrap
 from typing import Callable, Dict, List, NamedTuple, Sequence
 
 import poorconn
 from poorconn import make_socket_patchable
 
 shell_join = shlex.join if sys.version_info >= (3, 8) else ' '.join
+
+
+class ArgumentFormatter(ArgumentDefaultsHelpFormatter, RawDescriptionHelpFormatter):
+    "The formatter for our argument parsing."
+    pass
+
 
 SimulationCommand = NamedTuple('SimulationCommand', [('name', str),
                                                      ('params', Dict[str, Callable])])
@@ -76,7 +83,20 @@ def main(argv: Sequence) -> None:
 
     arg_parser = ArgumentParser(
         prog=shell_join((sys.executable, '-m', vars(sys.modules[__name__])['__package__'])),
-        formatter_class=ArgumentDefaultsHelpFormatter)
+        formatter_class=ArgumentFormatter,
+        epilog=textwrap.dedent('''
+        Example:
+
+        Start a HTTP server at localhost port 9000 that hosts static files at the current working directory. Require the
+        HTTP server to always closes connections upon accepting them:
+
+            %(prog)s -H localhost -p 9000 close_upon_acceptance
+
+        Start a HTTP server at localhost port 8000 that hosts static files at the current working directory. Throttle
+        the speed to roughly 1 KiB per second:
+
+            %(prog)s -m poorconn delay_before_sending_upon_acceptance --t=1 --length=1024
+        '''))
     arg_parser.add_argument('-H', '--host', help='Host name to bind to', type=str, default='localhost')
     arg_parser.add_argument('-p', '--port', help='Port to bind to', type=int, default=8000)
 
