@@ -59,20 +59,21 @@ Install this package via
 
    $ pip install 'poorconn[full]'  # or "pip install poorconn" if you don't need pytest support
 
-The following example starts a local HTTP server at port 8000 that always closes connections upon accepting them:
+Command Line Usage
+~~~~~~~~~~~~~~~~~~
 
-.. code-block:: python
+The following example starts a local HTTP server at port 8000 that hosts static files at the current working directory.
+It always closes connections upon accepting them:
 
-   from http.server import HTTPServer, SimpleHTTPRequestHandler
-   from poorconn import close_upon_acceptance, make_socket_patchable
+.. code-block:: console
 
-   # Start a local HTTP server that always closes connections upon established
-   with HTTPServer(("localhost", 8000), SimpleHTTPRequestHandler) as httpd:
-       httpd.socket = make_socket_patchable(httpd.socket)
-       close_upon_acceptance(httpd.socket)
-       httpd.serve_forever()
+   $ python -m poorconn -H localhost -p 8000 close_upon_acceptance
 
-After running the code above, connections from a client would establish but fail to communicate subsequently:
+In this command, ``python -m poorconn`` invokes Poorconn's command line entrypoint, ``-H localhost`` specifies
+the hostname, ``-p 8000`` specifies the port number, and ``close_upon_acceptance`` is a *simulation command* that
+simulates a specific poor network conditions, which in this case is closing connections upon accepting them.
+
+After running the command above, connections from a client would establish but fail to communicate subsequently:
 
 .. code-block:: console
 
@@ -82,8 +83,15 @@ After running the code above, connections from a client would establish but fail
    Giving up.
 
 For another example, to start a local HTTP server that always throttle connections upon accepting them, simply replace
-``close_upon_acceptance(s)`` above with ``delay_before_sending_upon_acceptance(s, t=1, length=1024)`` and adjust imports
-(here, :func:`poorconn.delay_before_sending_upon_acceptance` delays roughly 1 seconds for every 1024 bytes sent):
+``close_upon_acceptance`` above with ``delay_before_sending_upon_acceptance --t=1 --length=1024``:
+
+.. code-block:: console
+
+   $ python -m poorconn delay_before_sending_upon_acceptance --t=1 --length=1024
+
+Here, ``-H localhost -p 8000`` is omitted because it's Poorconn's default host and port settings. In this command,
+:func:`poorconn.delay_before_sending_upon_acceptance` delays roughly 1 seconds for every 1024 bytes sent. The connection
+is now throttled:
 
 .. code-block:: console
 
@@ -99,8 +107,32 @@ For another example, to start a local HTTP server that always throttle connectio
 
 (Output above is abridged.)
 
-See the `poorconn module API references <https://poorconn.topbug.net/apis/poorconn.html>`__ for a list of such
-simulation functions.
+Run ``python -m poorconn -h`` to view the help message and see the `poorconn module API references
+<https://poorconn.topbug.net/apis/poorconn.html>`__ for a list of simulation functions (which share the same names with
+simulation commands).
+
+Usage in Python
+~~~~~~~~~~~~~~~
+
+Running the following Python script achieves the same effects as the first command line example above:
+
+.. code-block:: python
+
+   from http.server import HTTPServer, SimpleHTTPRequestHandler
+   from poorconn import close_upon_acceptance, make_socket_patchable
+
+   # Start a local HTTP server that always closes connections upon established
+   with HTTPServer(("localhost", 8000), SimpleHTTPRequestHandler) as httpd:
+       httpd.socket = make_socket_patchable(httpd.socket)
+       close_upon_acceptance(httpd.socket)
+       httpd.serve_forever()
+
+The code snippet above is very similar to that runs a basic http server in Python, except that the socket object
+``httpd.socket`` is patched by :func:`poorconn.close_upon_acceptance` before http server is running.
+
+For the second command line example above, simply replace
+``close_upon_acceptance(s)`` above with ``delay_before_sending_upon_acceptance(s, t=1, length=1024)`` and adjust
+imports.
 
 Integration with Pytest
 ~~~~~~~~~~~~~~~~~~~~~~~
