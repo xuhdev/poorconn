@@ -15,6 +15,8 @@
 
 import itertools
 import pathlib
+import subprocess
+import sys
 import threading
 import time
 
@@ -22,6 +24,12 @@ import pytest
 import requests
 
 from poorconn._cli import main
+
+
+def run_from_cli(argv):
+    "Run from the command line interface."
+
+    return subprocess.run((sys.executable, '-m', 'poorconn') + tuple(argv), capture_output=True, text=True)
 
 
 def test_empty(capsys):
@@ -35,6 +43,13 @@ def test_empty(capsys):
     assert 'Simulation commands' in err
     assert 'close_upon_acceptance' in err
     assert len(out) == 0
+
+    # A little sanity test to make sure the program work from the actual command line interface
+    cmd = run_from_cli([])
+    assert cmd.returncode == 1
+    assert 'Simulation commands' in cmd.stderr
+    assert 'close_upon_acceptance' in cmd.stderr
+    assert len(cmd.stdout) == 0
 
 
 @pytest.mark.parametrize('help_op', ("-h", "--help"))
@@ -50,7 +65,12 @@ def test_help(capsys, help_op):
     assert 'close_upon_acceptance' in out
     assert len(err) == 0
 
-    # A little sanity test to make sure the program run from the actual command line
+    # A little sanity test to make sure the program work from the actual command line interface
+    cmd = run_from_cli([help_op])
+    assert cmd.returncode == 0
+    assert 'Simulation commands' in cmd.stdout
+    assert 'close_upon_acceptance' in cmd.stdout
+    assert len(cmd.stderr) == 0
 
 
 @pytest.mark.parametrize('help_op',
@@ -66,6 +86,12 @@ def test_simulation_command_help(capsys, help_op):
     out, err = capsys.readouterr()
     assert '--t' in out
     assert len(err) == 0
+
+    # A little sanity test to make sure the program work from the actual command line interface
+    cmd = run_from_cli(help_op)
+    assert cmd.returncode == 0
+    assert '--t' in cmd.stdout
+    assert len(cmd.stderr) == 0
 
 
 def test_basic_usage():
