@@ -124,9 +124,7 @@ def poorconn_http_server(tmp_path: pathlib.Path, request: pytest.FixtureRequest)
     with _HTTPServer((address, port), Handler) as httpd:
         httpd.socket = make_socket_patchable(httpd.socket)
         delay_before_sending_upon_acceptance(httpd.socket, t=t, length=length)
-        # Type ignored due to https://github.com/python/typeshed/pull/4882
-        # TODO: Remove this type ignore when a new mypy release is out
-        thread = httpd.serve_forever_new_thread()  # type: ignore
+        thread = httpd.serve_forever_new_thread()
         yield Server(server=httpd, url=f'http://{httpd.server_address[0]}:{httpd.server_address[1]}')
         httpd.shutdown()
 
