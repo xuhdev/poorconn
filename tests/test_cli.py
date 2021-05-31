@@ -24,6 +24,19 @@ import requests
 from poorconn._cli import main
 
 
+def test_empty(capsys):
+    'Test when no option is passed in (``python -m poorconn``).'
+
+    with pytest.raises(SystemExit) as e:
+        main([])
+
+    assert e.value.code == 1
+    out, err = capsys.readouterr()
+    assert 'Simulation commands' in err
+    assert 'close_upon_acceptance' in err
+    assert len(out) == 0
+
+
 @pytest.mark.parametrize('help_op', ("-h", "--help"))
 def test_help(capsys, help_op):
     'Test help options.'

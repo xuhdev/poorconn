@@ -87,6 +87,10 @@ def main(argv: Sequence) -> None:
                                           formatter_class=ArgumentDefaultsHelpFormatter)
         update_arg_parser_from_simulation_function(simulation_command, subparser)
 
+    if len(argv) == 0:
+        arg_parser.print_help(sys.stderr)
+        sys.exit(1)
+
     args = arg_parser.parse_args(argv)
 
     with HTTPServer((args.host, args.port), SimpleHTTPRequestHandler) as httpd:
