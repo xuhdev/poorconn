@@ -101,7 +101,7 @@ runtime-pypy-3.7:
   variables:
     PYTHON_VERSION_MINOR: "7"
 
-docker:
+.docker-test:
   services:
     - docker:stable-dind
   image: docker
@@ -119,3 +119,18 @@ docker:
     - docker run --rm --network test-net busybox wget -t 1 http://poorconn:8000
     - docker stop poorconn
   interruptible: true
+
+docker-test:
+  extends: ".docker-test"
+  except:
+    - master
+
+docker-deploy:
+  extends: ".docker-test"
+  stage: deploy
+  after_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker tag poorconn $CI_REGISTRY_IMAGE:latest
+    - docker push $CI_REGISTRY_IMAGE:latest
+  only:
+    - master

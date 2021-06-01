@@ -114,14 +114,14 @@ simulation commands).
 Docker Image
 ~~~~~~~~~~~~
 
-You can also run Poorconn as a command line tool using our `Docker image <https://quay.io/repository/xuhdev/poorconn>`__
-by replacing ``python -m poorconn`` with ``docker run poorconn``. For instance, the following achieves the same effect
-as the second example above:
+You can also run Poorconn as a command line tool using our
+`Docker image <https://gitlab.com/xuhdev/poorconn/container_registry/1996648>`__ by replacing ``python -m poorconn``
+with ``docker run registry.gitlab.com/xuhdev/poorconn``. For instance, the following achieves the same effect as the
+second command line example above:
 
 .. code-block:: console
 
-   $ docker run quay.io/xuhdev/poorconn delay_before_sending_upon_acceptance --t=1 --length=1024
-
+   $ docker run -p 8000:8000 registry.gitlab.com/xuhdev/poorconn delay_before_sending_upon_acceptance --t=1 --length=1024
 
 Usage in Python
 ~~~~~~~~~~~~~~~
