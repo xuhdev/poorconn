@@ -100,3 +100,22 @@ runtime-pypy-3.7:
   extends: ".runtime-pypy"
   variables:
     PYTHON_VERSION_MINOR: "7"
+
+docker:
+  services:
+    - docker:stable-dind
+  image: docker
+  script:
+    - docker version
+    - docker build . -t poorconn
+    # Create a Docker test-net so we can connect to the poorconn container from another container
+    - docker network create test-net
+    - docker run --rm --expose 8000 --network test-net -d --name poorconn poorconn delay_before_sending_upon_acceptance --t=1 --length=4096
+    - docker ps
+    # Leave some time for the poorconn container to start running
+    - sleep 20
+    # We don't use wget on the "host" because we are not running on a host -- we are running as a sibling of the
+    # poorconn container
+    - docker run --rm --network test-net busybox wget -t 1 http://poorconn:8000
+    - docker stop poorconn
+  interruptible: true

@@ -1,0 +1,9 @@
+.dockerignore
+Dockerfile
+
+*.egg-info
+build
+dist
+docs/apis/
+.gitlab-ci.yml
+.tox

@@ -111,6 +111,17 @@ Run ``python -m poorconn -h`` to view the help message and see the `poorconn mod
 <https://poorconn.topbug.net/apis/poorconn.html>`__ for a list of simulation functions (which share the same names with
 simulation commands).
 
+Docker Image
+~~~~~~~~~~~~
+
+You can also run Poorconn as a command line tool using our Docker image by replacing ``python -m poorconn`` with
+``docker run poorconn``. For instance, the following achieves the same effect as the second example above:
+
+.. code-block:: console
+
+   $ docker run quay.io/xuhdev/poorconn delay_before_sending_upon_acceptance --t=1 --length=1024
+
+
 Usage in Python
 ~~~~~~~~~~~~~~~
 
@@ -173,6 +184,8 @@ Contributions are welcome! To get started, check out :doc:`CONTRIBUTING`.
 
 Copyright and License
 ---------------------
+
+Unless otherwise stated in the headers of some files, all files in this project are licensed under LGPLv3+:
 
 Copyright (C) 2020--2021 Hong Xu <hong@topbug.net>
 
