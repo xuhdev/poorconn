@@ -114,8 +114,9 @@ simulation commands).
 Docker Image
 ~~~~~~~~~~~~
 
-You can also run Poorconn as a command line tool using our Docker image by replacing ``python -m poorconn`` with
-``docker run poorconn``. For instance, the following achieves the same effect as the second example above:
+You can also run Poorconn as a command line tool using our `Docker image <https://quay.io/repository/xuhdev/poorconn>`__
+by replacing ``python -m poorconn`` with ``docker run poorconn``. For instance, the following achieves the same effect
+as the second example above:
 
 .. code-block:: console
 

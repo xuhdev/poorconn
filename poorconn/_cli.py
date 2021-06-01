@@ -103,7 +103,7 @@ def main(argv: Sequence) -> None:
     subparsers = arg_parser.add_subparsers(title='Simulation commands', metavar='simulation_command',
                                            dest='simulation_command')
     for simulation_command in simulation_commands:
-        subparser = subparsers.add_parser(simulation_command.name, help=f'Use poorconn.{simulation_command}',
+        subparser = subparsers.add_parser(simulation_command.name, help=f'Use poorconn.{simulation_command.name}',
                                           formatter_class=ArgumentDefaultsHelpFormatter)
         update_arg_parser_from_simulation_function(simulation_command, subparser)
 
