@@ -25,6 +25,9 @@ def close_upon_acceptance(s: socket) -> None:
     """Shutdown and close the connection socket upon accepting.
 
     :param s: The :class:`socket.socket` object whose ``accept()`` function is to be wrapped.
+
+    .. versionchanged:: 0.2
+       Renamed from ``close_upon_accepting``.
     """
 
     def after(s: socket, *, original: Sequence, before: Any) -> Any:

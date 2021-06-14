@@ -1,6 +1,9 @@
 Command Line Usage
 ==================
 
+.. versionadded:: 0.2
+   The command line interface became available.
+
 Poorconn can be used from the command line. Both :ref:`quickstart` and ``python -m poorconn --help`` have offered some
 introductory examples of the command line usage. The command line follows the following usage pattern:
 
